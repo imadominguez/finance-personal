@@ -40,7 +40,7 @@ export function AuthForm({ mode, action }: AuthFormProps) {
   const copy = COPY[mode];
 
   // A dónde volver después de entrar, si el proxy nos mandó acá desde otra ruta.
-  const siguiente = searchParams.get("siguiente") ?? "/";
+  const siguiente = searchParams.get("siguiente") ?? "/hoy";
 
   return (
     <div className="surface-card animate-fade-up rounded-2xl p-6">

@@ -48,7 +48,7 @@ export function AppShell({
         <div className="mx-auto w-full max-w-3xl px-4">
           <div className="flex h-14 items-center justify-between gap-3">
             <Link
-              href="/"
+              href="/hoy"
               className="group flex items-center gap-2 transition-opacity hover:opacity-80"
             >
               <span className="brand-gradient flex size-8 items-center justify-center rounded-lg text-[#0a0a0a] shadow-[0_4px_16px_-6px_rgba(232,93,36,0.9)] transition-transform duration-300 group-hover:scale-105 motion-reduce:group-hover:scale-100">

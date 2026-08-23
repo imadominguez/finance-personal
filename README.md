@@ -11,16 +11,47 @@ dark mode, acentos naranja y animaciones suaves.
 
 | Pantalla | Qué muestra |
 |---|---|
-| `/` **Hoy** | Cuánto llevás gastado hoy, contra tu promedio diario y contra el día anterior. Cuánto podés gastar por día con lo que queda del mes. |
+| `/hoy` **Hoy** | Cuánto llevás gastado hoy, contra tu promedio diario y contra el día anterior. Cuánto podés gastar por día con lo que queda del mes. |
 | `/mes` **Mes** | "¿A dónde se fue tu sueldo?": total del mes, avance contra tu presupuesto, dona por categoría, gasto día por día, ranking de categorías y proyección de cierre. |
 | `/anio` **Año** | Tendencia mes a mes, mes más caro y más barato, promedio mensual y en qué se fue el año. |
 | `/movimientos` | Historial completo con filtros por texto, tipo, categoría y rango de fechas. |
 | `/fijos` | Gastos e ingresos fijos (alquiler, servicios, sueldo) y compras en cuotas. |
 | `/categorias` | ABM de categorías con color e ícono, y el acumulado del año de cada una. |
 | `/ajustes` | Presupuesto mensual, moneda, exportar/importar JSON, cuenta y borrado. |
+| `/` | Landing institucional pública: qué hace la app, cómo funciona y preguntas. |
 | `/ingresar`, `/crear-cuenta` | Acceso con email y contraseña. |
 
 Atajo: la tecla **`n`** abre el alta de movimiento desde cualquier pantalla.
+
+`/` es la landing pública; el resumen del día vive en `/hoy`. Con la sesión iniciada, `/`
+redirige directo a `/hoy`.
+
+## PWA
+
+La app se instala en el teléfono o el escritorio y se abre a pantalla completa.
+
+- **Manifiesto** en `app/manifest.ts` (ruta de metadatos de Next), con íconos comunes y
+  *maskable*, y accesos directos a Hoy, Mes y Movimientos. `start_url` es `/hoy`: quien la
+  instaló ya sabe qué es, quiere ver sus números.
+- **Service worker** en `public/sw.js`, registrado después del `load` y solo en producción.
+- **Sin conexión** muestra `/sin-conexion`, que se recarga sola cuando vuelve la red.
+- **Invitación a instalar** con `beforeinstallprompt` en Chrome y Edge, e instrucciones
+  para iOS, donde Safari no lo implementa. Se puede descartar y no vuelve a molestar.
+
+### Qué se cachea, y qué no
+
+El service worker **nunca guarda el HTML de las pantallas con sesión**. Esas páginas llevan
+los movimientos de una persona: guardarlas en el disco del navegador haría que, en un
+dispositivo compartido, la siguiente persona pudiera verlos desde la caché. Solo se guardan
+recursos estáticos, que son iguales para todos, y la pantalla de sin conexión.
+
+Por eso la app necesita red para funcionar: sin conexión no hay forma honesta de mostrar
+datos que viven en la cuenta. Si alguna vez se quiere trabajar offline de verdad, el camino
+es replicar en IndexedDB con sincronización, no cachear HTML.
+
+El `matcher` del proxy excluye el manifiesto, el service worker y los íconos: si el proxy
+los redirigiera al login, el navegador recibiría HTML donde espera JSON y la app dejaría de
+ser instalable.
 
 ## Cuentas y datos
 
@@ -106,17 +137,30 @@ que hayas exportado.
    `DATABASE_URL_UNPOOLED` (directa) al proyecto.
 2. **Agregá `SESSION_SECRET`** en *Settings → Environment Variables*, con el valor de
    `openssl rand -base64 32`. Usá uno distinto al de desarrollo.
-3. **Aplicá las migraciones** una vez, desde tu máquina:
+3. **Deploy**. El `build` corre `prisma generate && prisma migrate deploy && next build`,
+   así que las tablas se crean solas en el primer despliegue y las migraciones nuevas se
+   aplican en cada uno. No hay un paso manual que se pueda olvidar.
 
-   ```bash
-   DATABASE_URL_UNPOOLED="<la URL directa de Neon>" pnpm db:deploy
-   ```
+   Las migraciones van sobre la conexión **sin pooler** a propósito: pgbouncer, en modo
+   transacción, no soporta las sentencias que usan. `prisma.config.ts` prefiere
+   `DATABASE_URL_UNPOOLED` cuando existe.
 
-   Va sobre la conexión **sin pooler** a propósito: pgbouncer, en modo transacción, no
-   soporta las sentencias que usan las migraciones. `prisma.config.ts` ya prefiere
-   `DATABASE_URL_UNPOOLED` cuando existe, así que no hace falta hacer nada más.
+Si preferís aplicarlas a mano antes de deployar:
 
-4. **Deploy**. El `build` corre `prisma generate` solo.
+```bash
+DATABASE_URL_UNPOOLED="<la URL directa de Neon>" pnpm db:deploy
+pnpm db:status   # confirma contra qué base y si está al día
+```
+
+### Si algo falla
+
+`pnpm db:status` dice contra qué base apunta el CLI y si las migraciones están al día. Es
+lo primero que conviene mirar.
+
+La app también sabe explicarse cuando el problema es de infraestructura: si la base
+responde pero le faltan las tablas, o si no se puede conectar, la pantalla de ingreso lo
+dice en castellano en vez de mostrar un stack trace. Cualquier otro error sigue
+propagando, para no esconder un bug real detrás de un mensaje amable.
 
 ### Detalles de Neon que conviene saber
 

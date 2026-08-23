@@ -3,7 +3,7 @@ import { NextResponse, type NextRequest } from "next/server";
 import { decrypt } from "@/lib/auth/session";
 import { COOKIE_NAME } from "@/lib/auth/session";
 
-const PUBLIC_ROUTES = ["/ingresar", "/crear-cuenta"];
+const PUBLIC_ROUTES = ["/", "/ingresar", "/crear-cuenta", "/sin-conexion"];
 
 /**
  * Chequeo optimista de sesión (en Next 16 el antiguo `middleware` se llama
@@ -19,17 +19,29 @@ export default async function proxy(request: NextRequest) {
   if (!isPublic && !session) {
     const url = new URL("/ingresar", request.nextUrl);
     // Para volver a donde quería entrar después de iniciar sesión.
-    if (path !== "/") url.searchParams.set("siguiente", path);
+    url.searchParams.set("siguiente", path);
     return NextResponse.redirect(url);
   }
 
-  if (isPublic && session) {
-    return NextResponse.redirect(new URL("/", request.nextUrl));
+  // Con sesión iniciada, la landing y las pantallas de acceso no aportan:
+  // se va derecho al resumen del día. /sin-conexion sí tiene que poder verse.
+  if (isPublic && session && path !== "/sin-conexion") {
+    return NextResponse.redirect(new URL("/hoy", request.nextUrl));
   }
 
   return NextResponse.next();
 }
 
 export const config = {
-  matcher: ["/((?!api|_next/static|_next/image|favicon.ico|.*\\.svg$).*)"],
+  matcher: [
+    /*
+     * El proxy solo debe correr sobre navegaciones.
+     *
+     * Los archivos de la PWA (manifiesto, service worker, íconos) tienen que
+     * poder pedirse sin sesión: si el proxy los redirige al login, el navegador
+     * recibe HTML donde espera JSON o JavaScript y la app deja de ser
+     * instalable.
+     */
+    "/((?!api|_next/static|_next/image|sw\\.js|manifest\\.webmanifest|icons/|favicon\\.ico|.*\\.(?:svg|png|jpg|jpeg|webp|avif|ico|txt|xml|json)$).*)",
+  ],
 };
