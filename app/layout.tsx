@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from "next";
+import { Analytics } from "@vercel/analytics/next";
 import { Inter, JetBrains_Mono } from "next/font/google";
 
 import { InstallProvider } from "@/components/pwa/install-provider";
@@ -74,6 +75,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       <body className="min-h-full">
         <InstallProvider>{children}</InstallProvider>
         <ServiceWorkerRegistration />
+        <Analytics />
       </body>
     </html>
   );
