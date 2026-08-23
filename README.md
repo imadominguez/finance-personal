@@ -72,7 +72,7 @@ Necesitás una base PostgreSQL. Podés levantar una local o usar la de Vercel (v
 
 ```bash
 pnpm install
-cp .env.example .env          # completá DATABASE_URL y SESSION_SECRET
+cp .env.example .env          # completá las URLs y SESSION_SECRET
 openssl rand -base64 32       # para SESSION_SECRET
 pnpm db:migrate               # crea las tablas
 pnpm dev                      # http://localhost:3000
@@ -99,21 +99,34 @@ Al entrar a *Ajustes* desde el mismo navegador que usabas antes, la app detecta 
 viejos y ofrece subirlos a tu cuenta con un botón. También podés importar a mano el JSON
 que hayas exportado.
 
-## Deploy en Vercel
+## Deploy en Vercel (con Neon)
 
 1. **Creá la base**: en el panel de tu proyecto, **Storage → Create Database → Postgres**.
-   Vercel la provisiona (Neon por debajo) y agrega `DATABASE_URL` al proyecto.
+   Vercel la provisiona con Neon y agrega solas `DATABASE_URL` (pooled) y
+   `DATABASE_URL_UNPOOLED` (directa) al proyecto.
 2. **Agregá `SESSION_SECRET`** en *Settings → Environment Variables*, con el valor de
    `openssl rand -base64 32`. Usá uno distinto al de desarrollo.
-3. **Deploy**. El `build` corre `prisma generate` solo.
-4. **Aplicá las migraciones** una vez, apuntando a la base de producción:
+3. **Aplicá las migraciones** una vez, desde tu máquina:
 
    ```bash
-   DATABASE_URL="<la de Vercel>" pnpm db:deploy
+   DATABASE_URL_UNPOOLED="<la URL directa de Neon>" pnpm db:deploy
    ```
 
-   Si tu proveedor da una URL *pooled* y una *direct*, usá la **direct** para las migraciones
-   y la *pooled* para `DATABASE_URL` en runtime.
+   Va sobre la conexión **sin pooler** a propósito: pgbouncer, en modo transacción, no
+   soporta las sentencias que usan las migraciones. `prisma.config.ts` ya prefiere
+   `DATABASE_URL_UNPOOLED` cuando existe, así que no hace falta hacer nada más.
+
+4. **Deploy**. El `build` corre `prisma generate` solo.
+
+### Detalles de Neon que conviene saber
+
+- La app usa la URL **pooled** en runtime. Todas las consultas van por
+  `prisma.$transaction([...])` en su forma de array, que es compatible con el pooler; no se
+  usan transacciones interactivas, que sí romperían.
+- `channel_binding=require` funciona: `pg` negocia `SCRAM-SHA-256-PLUS` sobre TLS.
+- El plan gratuito **apaga la base cuando no se usa**. La primera consulta después de un
+  rato tarda un poco más mientras despierta. Si ves timeouts al arrancar, agregá
+  `connect_timeout=15` a `DATABASE_URL`.
 
 ## Estructura
 
