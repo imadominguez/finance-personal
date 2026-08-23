@@ -25,13 +25,21 @@ enum PaymentMethod {
 }
 
 model User {
-  id           String   @id @default(cuid())
-  email        String   @unique
-  /// Hash scrypt en formato `salt:hash`. Nunca se expone al cliente.
-  passwordHash String
-  name         String   @default("")
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  id    String @id @default(cuid())
+  email String @unique
+
+  /// `sub` de Google: su identificador estable, que no cambia aunque la
+  /// persona cambie de email. Es la clave real de la identidad.
+  googleId String? @unique
+  /// Foto de perfil de Google, para el avatar.
+  image    String?
+  /// Google confirmó que el email le pertenece. Sin esto no se vincula una
+  /// cuenta preexistente, porque alcanzaría para apropiarse de ella.
+  emailVerified Boolean @default(false)
+
+  name      String   @default("")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   settings     Settings?
   sessions     Session[]

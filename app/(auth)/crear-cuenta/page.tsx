@@ -1,20 +1,9 @@
-import { Suspense } from "react";
-import type { Metadata } from "next";
+import { redirect } from "next/navigation";
 
-import { AuthForm } from "@/components/auth/auth-form";
-import { signupAction } from "@/app/actions/auth";
-
-export const metadata: Metadata = {
-  title: "Crear cuenta",
-  description: "Creá tu cuenta para empezar a registrar tus gastos.",
-};
-
+/**
+ * Ya no hay alta separada: al entrar con Google, si la cuenta no existe se crea.
+ * La ruta se mantiene para que los enlaces viejos no queden rotos.
+ */
 export default function CrearCuentaPage() {
-  return (
-    <Suspense
-      fallback={<div className="surface-card h-96 animate-pulse rounded-2xl" />}
-    >
-      <AuthForm mode="crear-cuenta" action={signupAction} />
-    </Suspense>
-  );
+  redirect("/ingresar");
 }

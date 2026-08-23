@@ -24,5 +24,11 @@ export default defineConfig({
   },
   datasource: {
     url: migrationUrl,
+    /*
+     * Base descartable que Prisma usa para calcular diferencias entre el
+     * historial de migraciones y el schema. Nunca se toca en producción; si no
+     * está definida, `migrate diff` contra el directorio de migraciones falla.
+     */
+    shadowDatabaseUrl: process.env["SHADOW_DATABASE_URL"],
   },
 });

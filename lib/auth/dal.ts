@@ -16,6 +16,8 @@ export interface CurrentUser {
   id: string;
   email: string;
   name: string;
+  /** Foto de perfil de Google, si la cuenta tiene. */
+  image: string | null;
 }
 
 /**
@@ -73,6 +75,6 @@ export const getCurrentUser = cache(async (): Promise<CurrentUser | null> => {
 
   return prisma.user.findUnique({
     where: { id: session.userId },
-    select: { id: true, email: true, name: true },
+    select: { id: true, email: true, name: true, image: true },
   });
 });

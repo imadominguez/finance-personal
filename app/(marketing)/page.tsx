@@ -88,7 +88,7 @@ export default function LandingPage() {
                 <Button
                   size="lg"
                   className="h-11 px-5 text-[0.95rem]"
-                  render={<Link href="/crear-cuenta" />}
+                  render={<Link href="/ingresar" />}
                 >
                   Empezar gratis
                   <ArrowRight />
@@ -279,7 +279,7 @@ export default function LandingPage() {
               <Button
                 size="lg"
                 className="mt-7 h-11 px-6 text-[0.95rem]"
-                render={<Link href="/crear-cuenta" />}
+                render={<Link href="/ingresar" />}
               >
                 Crear mi cuenta
                 <ArrowRight />

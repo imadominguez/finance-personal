@@ -19,7 +19,7 @@ dark mode, acentos naranja y animaciones suaves.
 | `/categorias` | ABM de categorías con color e ícono, y el acumulado del año de cada una. |
 | `/ajustes` | Presupuesto mensual, moneda, exportar/importar JSON, cuenta y borrado. |
 | `/` | Landing institucional pública: qué hace la app, cómo funciona y preguntas. |
-| `/ingresar`, `/crear-cuenta` | Acceso con email y contraseña. |
+| `/ingresar` | Acceso con Google. `/crear-cuenta` redirige acá: no hay alta separada. |
 
 Atajo: la tecla **`n`** abre el alta de movimiento desde cualquier pantalla.
 
@@ -118,18 +118,49 @@ ser instalable.
 
 ## Cuentas y datos
 
-Cada persona tiene su cuenta y ve **solo lo suyo**. Todas las tablas cuelgan de `User`, y
-ninguna consulta llega a la base sin pasar por el DAL (`lib/auth/dal.ts`), que es el único
-lugar donde se resuelve de quién son los datos.
+Se entra **solo con Google**. No hay contraseñas: ingresar y registrarse son lo mismo, y si
+la cuenta no existe se crea al entrar.
 
-- **Contraseñas**: hash `scrypt` (Node core, sin binarios nativos que compliquen el deploy),
-  con salt por usuario y comparación en tiempo constante.
+Cada persona ve **solo lo suyo**. Todas las tablas cuelgan de `User`, y ninguna consulta
+llega a la base sin pasar por el DAL (`lib/auth/dal.ts`), que es el único lugar donde se
+resuelve de quién son los datos.
+
+- **OAuth con Google** implementado a mano en `lib/auth/google.ts` y `app/api/auth/google/`,
+  con `state` (contra CSRF) y PKCE. El `id_token` se verifica contra las claves públicas de
+  Google aunque el intercambio ya haya sido servidor a servidor: es barato y cierra la
+  puerta a un token de otro emisor.
 - **Sesiones**: se guardan en la tabla `sessions`; el navegador solo recibe el id firmado
   (JWT con `jose`) en una cookie `httpOnly`, `sameSite=lax` y `secure` en producción.
 - **`proxy.ts`** hace un chequeo optimista para redirigir al login sin consultar la base en
   cada navegación. La verificación real, contra la tabla de sesiones, vive en el DAL.
 - Cada Server Action valida su entrada con **Zod** y filtra por `userId`: una acción es un
   endpoint público, así que nada se escribe confiando en lo que mande el cliente.
+
+### Cómo se resuelve a qué cuenta corresponde
+
+El orden importa y es una decisión de seguridad (`lib/auth/account.ts`):
+
+1. Por `googleId`, el identificador estable de Google. Si ya entró antes es esta cuenta,
+   aunque haya cambiado de email.
+2. Por email, **solo si Google confirma que le pertenece**. Así una cuenta vieja, de cuando
+   se entraba con contraseña, se vincula y conserva todos sus movimientos. Sin esa
+   verificación, declarar un email ajeno alcanzaría para quedarse con la cuenta.
+3. Si no existe, se crea con las categorías base ya cargadas.
+
+Un email sin verificar se rechaza con un mensaje explicando por qué.
+
+### Configurar Google
+
+En Google Cloud Console → APIs y servicios → Credenciales → ID de cliente OAuth, tipo
+*Aplicación web*. En **URI de redireccionamiento autorizados** hay que dar de alta una por
+cada origen, tal cual:
+
+```
+http://localhost:3000/api/auth/google/callback
+https://tu-dominio.vercel.app/api/auth/google/callback
+```
+
+Después, `GOOGLE_CLIENT_ID` y `GOOGLE_CLIENT_SECRET` en las variables de entorno.
 
 Borrar la cuenta elimina en cascada todos sus movimientos, categorías, fijos y cuotas.
 
@@ -183,9 +214,9 @@ pnpm db:deploy    # aplicar migraciones existentes (producción)
 pnpm db:studio    # explorar la base en el navegador
 ```
 
-Creá tu cuenta en `/crear-cuenta`. Arranca con las categorías base; podés cargar tu primer
-gasto o tocar **"Cargar datos de ejemplo"** para ver 12 meses de datos verosímiles y
-borrarlos después desde *Ajustes*.
+Entrá en `/ingresar` con tu cuenta de Google. La primera vez se crea sola, con las
+categorías base; podés cargar tu primer gasto o tocar **"Cargar datos de ejemplo"** para ver
+12 meses de datos verosímiles y borrarlos después desde *Ajustes*.
 
 ### Si venías de la versión con localStorage
 
@@ -254,7 +285,7 @@ components/
   providers/            Estado del cliente sobre el estado del servidor
   ui/                   Primitivas shadcn/ui (Base UI)
 lib/
-  auth/                 Sesiones, hash de contraseñas y DAL
+  auth/                 OAuth con Google, sesiones y DAL
   db/                   Cliente Prisma, consultas, mapeos y datos de ejemplo
   validation/           Schemas Zod de todo lo que entra desde el cliente
   types.ts              Modelo de datos de la interfaz

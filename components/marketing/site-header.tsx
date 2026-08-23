@@ -17,12 +17,10 @@ export function MarketingHeader() {
           </span>
         </Link>
 
-        <nav className="flex items-center gap-1.5">
-          <Button variant="ghost" size="lg" render={<Link href="/ingresar" />}>
-            Ingresar
-          </Button>
-          <Button size="lg" render={<Link href="/crear-cuenta" />}>
-            Crear cuenta
+        <nav className="flex items-center">
+          {/* Un solo camino: entrar con Google crea la cuenta si no existe. */}
+          <Button size="lg" render={<Link href="/ingresar" />}>
+            Entrar
           </Button>
         </nav>
       </div>
