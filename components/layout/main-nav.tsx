@@ -24,7 +24,7 @@ interface NavItem {
 }
 
 export const NAV_ITEMS: NavItem[] = [
-  { href: "/", label: "Hoy", icon: Sun, primary: true },
+  { href: "/hoy", label: "Hoy", icon: Sun, primary: true },
   { href: "/mes", label: "Mes", icon: CalendarDays, primary: true },
   { href: "/anio", label: "Año", icon: CalendarRange, primary: true },
   { href: "/movimientos", label: "Movimientos", icon: ListFilter },

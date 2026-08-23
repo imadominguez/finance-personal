@@ -19,7 +19,7 @@ export interface AuthFormState {
 /** Solo se permite volver a rutas internas: evita redirecciones abiertas. */
 function safeRedirect(target: FormDataEntryValue | null): string {
   const value = typeof target === "string" ? target : "";
-  return value.startsWith("/") && !value.startsWith("//") ? value : "/";
+  return value.startsWith("/") && !value.startsWith("//") ? value : "/hoy";
 }
 
 export async function signupAction(
