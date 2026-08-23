@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 
 import { HeroPreview } from "@/components/marketing/hero-preview";
+import { IntroVideo } from "@/components/marketing/intro-video";
 import { MarketingHeader } from "@/components/marketing/site-header";
 import {
   Faq,
@@ -115,6 +116,16 @@ export default function LandingPage() {
             </div>
           </div>
         </section>
+
+        {/* Video introductorio */}
+        <Section
+          id="video"
+          eyebrow="En 39 segundos"
+          title="Mirá de qué se trata"
+          description="Qué problema resuelve, cómo se carga un gasto y qué vas a ver en el día, en el mes y en el año."
+        >
+          <IntroVideo />
+        </Section>
 
         {/* Qué hace */}
         <Section

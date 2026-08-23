@@ -37,11 +37,11 @@ export const config = {
     /*
      * El proxy solo debe correr sobre navegaciones.
      *
-     * Los archivos de la PWA (manifiesto, service worker, íconos) tienen que
-     * poder pedirse sin sesión: si el proxy los redirige al login, el navegador
-     * recibe HTML donde espera JSON o JavaScript y la app deja de ser
-     * instalable.
+     * Los archivos estáticos (manifiesto, service worker, íconos, el video de
+     * la landing) tienen que poder pedirse sin sesión: si el proxy los redirige
+     * al login, el navegador recibe HTML donde espera JSON, JavaScript o video,
+     * y la app deja de ser instalable o el video no carga.
      */
-    "/((?!api|_next/static|_next/image|sw\\.js|manifest\\.webmanifest|icons/|favicon\\.ico|.*\\.(?:svg|png|jpg|jpeg|webp|avif|ico|txt|xml|json)$).*)",
+    "/((?!api|_next/static|_next/image|sw\\.js|manifest\\.webmanifest|icons/|favicon\\.ico|.*\\.(?:svg|png|jpg|jpeg|webp|avif|ico|txt|xml|json|mp4|webm|vtt)$).*)",
   ],
 };

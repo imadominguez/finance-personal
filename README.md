@@ -26,6 +26,23 @@ Atajo: la tecla **`n`** abre el alta de movimiento desde cualquier pantalla.
 `/` es la landing pública; el resumen del día vive en `/hoy`. Con la sesión iniciada, `/`
 redirige directo a `/hoy`.
 
+## El video de la landing
+
+El explicativo de la portada no es una grabación de pantalla: es **HTML y CSS
+animados, capturados cuadro por cuadro**. La fuente está en `scripts/video/` y se
+versiona como cualquier otro código.
+
+La clave es que el guion no se anima solo: expone una función `seek(t)` que dibuja
+el estado exacto del video en el segundo `t`. El grabador pide cada cuadro, lo
+fotografía y lo manda por tubería a ffmpeg. Salen 30 cuadros por segundo exactos y
+reproducibles, sin los cuadros perdidos de un grabador de pantalla, y sin escribir
+1170 imágenes en disco.
+
+Se publica en dos formatos —MP4 (H.264) para todo, incluido Safari en iOS, y WebM
+(VP9), más liviano donde se soporta— con `preload="none"`, así quien entra a leer
+no se baja un mega de video sin pedirlo. Los detalles y cómo regenerarlo están en
+`scripts/video/README.md`.
+
 ## PWA
 
 La app se instala en el teléfono o el escritorio y se abre a pantalla completa.
