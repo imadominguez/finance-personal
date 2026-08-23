@@ -4,6 +4,7 @@ import { cache } from "react";
 import { redirect } from "next/navigation";
 
 import { prisma } from "@/lib/db/prisma";
+import { describeDatabaseError } from "@/lib/db/errors";
 import { readSessionCookie } from "@/lib/auth/session";
 
 export interface AuthSession {
@@ -32,10 +33,22 @@ export const getSession = cache(async (): Promise<AuthSession | null> => {
   const payload = await readSessionCookie();
   if (!payload) return null;
 
-  const session = await prisma.session.findUnique({
-    where: { id: payload.sessionId },
-    select: { id: true, userId: true, expiresAt: true },
-  });
+  let session: { id: string; userId: string; expiresAt: Date } | null;
+
+  try {
+    session = await prisma.session.findUnique({
+      where: { id: payload.sessionId },
+      select: { id: true, userId: true, expiresAt: true },
+    });
+  } catch (error) {
+    // Si la base no está migrada o no responde, tratamos la petición como
+    // anónima: el usuario cae en el login, que sí sabe explicar qué pasa.
+    // Mejor eso que un 500 con stack trace en cada ruta de la app.
+    const message = describeDatabaseError(error);
+    if (!message) throw error;
+    console.error("Error de base al verificar la sesión:", message);
+    return null;
+  }
 
   // La cookie puede sobrevivir a la sesión: si no está en la base, o venció,
   // o quedó apuntando a otro usuario, no vale.

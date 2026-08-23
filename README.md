@@ -106,17 +106,30 @@ que hayas exportado.
    `DATABASE_URL_UNPOOLED` (directa) al proyecto.
 2. **Agregá `SESSION_SECRET`** en *Settings → Environment Variables*, con el valor de
    `openssl rand -base64 32`. Usá uno distinto al de desarrollo.
-3. **Aplicá las migraciones** una vez, desde tu máquina:
+3. **Deploy**. El `build` corre `prisma generate && prisma migrate deploy && next build`,
+   así que las tablas se crean solas en el primer despliegue y las migraciones nuevas se
+   aplican en cada uno. No hay un paso manual que se pueda olvidar.
 
-   ```bash
-   DATABASE_URL_UNPOOLED="<la URL directa de Neon>" pnpm db:deploy
-   ```
+   Las migraciones van sobre la conexión **sin pooler** a propósito: pgbouncer, en modo
+   transacción, no soporta las sentencias que usan. `prisma.config.ts` prefiere
+   `DATABASE_URL_UNPOOLED` cuando existe.
 
-   Va sobre la conexión **sin pooler** a propósito: pgbouncer, en modo transacción, no
-   soporta las sentencias que usan las migraciones. `prisma.config.ts` ya prefiere
-   `DATABASE_URL_UNPOOLED` cuando existe, así que no hace falta hacer nada más.
+Si preferís aplicarlas a mano antes de deployar:
 
-4. **Deploy**. El `build` corre `prisma generate` solo.
+```bash
+DATABASE_URL_UNPOOLED="<la URL directa de Neon>" pnpm db:deploy
+pnpm db:status   # confirma contra qué base y si está al día
+```
+
+### Si algo falla
+
+`pnpm db:status` dice contra qué base apunta el CLI y si las migraciones están al día. Es
+lo primero que conviene mirar.
+
+La app también sabe explicarse cuando el problema es de infraestructura: si la base
+responde pero le faltan las tablas, o si no se puede conectar, la pantalla de ingreso lo
+dice en castellano en vez de mostrar un stack trace. Cualquier otro error sigue
+propagando, para no esconder un bug real detrás de un mensaje amable.
 
 ### Detalles de Neon que conviene saber
 
