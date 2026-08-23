@@ -253,6 +253,7 @@ export function AjustesView({ user }: AjustesViewProps) {
       </SectionCard>
 
       <SectionCard
+        id="cuenta"
         title="Tu cuenta"
         description={user?.email ?? ""}
         delay={240}
