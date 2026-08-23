@@ -88,15 +88,15 @@
 ## Restricciones y Requisitos
 
 > **Actualizado**: la app pasó a ser **multiusuario con cuentas**. Cada persona se
-> registra con email y contraseña y ve solo sus datos; todas las tablas cuelgan de
-> `User`. Las contraseñas usan hash `scrypt` y las sesiones viven en la tabla
-> `sessions`, con el id firmado en una cookie `httpOnly`. Ver `README.md` y
-> `lib/auth/`.
+> ingresa **con Google** (OAuth 2.0 + PKCE, implementado a mano en `lib/auth/google.ts`)
+> y ve solo sus datos; todas las tablas cuelgan de `User`. No hay contraseñas. Las
+> sesiones viven en la tabla `sessions`, con el id firmado en una cookie `httpOnly`.
+> Ver `README.md` y `lib/auth/`.
 
 ❌ NO incluir:
 - Notificaciones de presupuesto
 - Sincronización en tiempo real
-- Login con proveedores externos (OAuth): por ahora solo email y contraseña
+- Ingreso con email y contraseña: se eliminó, solo se entra con Google
 
 ✅ INCLUIR:
 - Cuentas de usuario con datos aislados por `userId`

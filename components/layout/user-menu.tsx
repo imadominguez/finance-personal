@@ -16,7 +16,7 @@ import {
 import { cn } from "@/lib/utils";
 
 interface UserMenuProps {
-  user: { email: string; name: string } | null;
+  user: { email: string; name: string; image: string | null } | null;
 }
 
 /**
@@ -50,12 +50,23 @@ export function UserMenu({ user }: UserMenuProps) {
       <DropdownMenuTrigger
         aria-label="Tu cuenta"
         className={cn(
-          "flex size-8 shrink-0 items-center justify-center rounded-full border border-hairline bg-surface-raised text-xs font-semibold transition-all duration-200 outline-none",
+          "flex size-8 shrink-0 items-center justify-center overflow-hidden rounded-full border border-hairline bg-surface-raised text-xs font-semibold transition-all duration-200 outline-none",
           "hover:border-brand/50 hover:text-brand focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50",
           "aria-expanded:border-brand/60 aria-expanded:bg-brand/10 aria-expanded:text-brand",
         )}
       >
-        {inicial}
+        {user.image ? (
+          // Foto de Google. Si falla la carga queda la inicial detrás.
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={user.image}
+            alt=""
+            referrerPolicy="no-referrer"
+            className="size-full rounded-full object-cover"
+          />
+        ) : (
+          inicial
+        )}
       </DropdownMenuTrigger>
 
       <DropdownMenuContent
@@ -64,9 +75,19 @@ export function UserMenu({ user }: UserMenuProps) {
         className="w-60 min-w-60 p-1.5"
       >
         <div className="flex items-center gap-2.5 px-1.5 py-2">
-          <span className="brand-gradient flex size-9 shrink-0 items-center justify-center rounded-full text-sm font-semibold text-[#0a0a0a]">
-            {inicial}
-          </span>
+          {user.image ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={user.image}
+              alt=""
+              referrerPolicy="no-referrer"
+              className="size-9 shrink-0 rounded-full object-cover"
+            />
+          ) : (
+            <span className="brand-gradient flex size-9 shrink-0 items-center justify-center rounded-full text-sm font-semibold text-[#0a0a0a]">
+              {inicial}
+            </span>
+          )}
           <div className="min-w-0">
             <p className="truncate text-sm font-medium">{nombre}</p>
             <p className="truncate text-xs text-muted-foreground">

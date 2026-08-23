@@ -86,17 +86,7 @@ export const settingsSchema = z.object({
   displayName: z.string().trim().max(60),
 });
 
-export const credentialsSchema = z.object({
-  email: z.email("Ingresá un email válido").trim().toLowerCase().max(200),
-  password: z
-    .string()
-    .min(8, "La contraseña tiene que tener al menos 8 caracteres")
-    .max(200),
-});
 
-export const signupSchema = credentialsSchema.extend({
-  name: z.string().trim().max(60).optional(),
-});
 
 export type TransactionInput = z.infer<typeof transactionSchema>;
 export type CategoryInput = z.infer<typeof categorySchema>;

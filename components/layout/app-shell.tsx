@@ -19,7 +19,7 @@ export function AppShell({
   user,
   children,
 }: {
-  user: { email: string; name: string } | null;
+  user: { email: string; name: string; image: string | null } | null;
   children: React.ReactNode;
 }) {
   const [creating, setCreating] = React.useState(false);
