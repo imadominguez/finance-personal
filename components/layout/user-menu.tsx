@@ -2,9 +2,10 @@
 
 import * as React from "react";
 import Link from "next/link";
-import { LogOut, Settings, UserRound } from "lucide-react";
+import { Download, LogOut, Settings, UserRound } from "lucide-react";
 
 import { logoutAction } from "@/app/actions/auth";
+import { useInstall } from "@/components/pwa/install-provider";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -31,6 +32,7 @@ interface UserMenuProps {
  */
 export function UserMenu({ user }: UserMenuProps) {
   const [saliendo, startTransition] = React.useTransition();
+  const { puedeInstalar, instalada, instalar } = useInstall();
 
   if (!user) return null;
 
@@ -90,6 +92,18 @@ export function UserMenu({ user }: UserMenuProps) {
           <Settings />
           Ajustes
         </DropdownMenuItem>
+
+        {/* Solo si el navegador realmente puede instalarla acá y ahora. */}
+        {puedeInstalar && !instalada ? (
+          <DropdownMenuItem
+            className="cursor-pointer px-2 py-2"
+            closeOnClick={false}
+            onClick={() => void instalar()}
+          >
+            <Download />
+            Instalar la app
+          </DropdownMenuItem>
+        ) : null}
 
         <DropdownMenuSeparator />
 

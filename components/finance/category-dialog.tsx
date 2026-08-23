@@ -169,7 +169,7 @@ function CategoryForm({
 
         <div className="flex flex-col gap-2">
           <Label>Ícono</Label>
-          <div className="grid max-h-40 grid-cols-8 gap-1.5 overflow-y-auto pr-1">
+          <div className="grid grid-cols-8 gap-1.5 sm:max-h-40 sm:overflow-y-auto sm:pr-1">
             {CATEGORY_ICONS.map((option) => {
               const Icon = resolveIcon(option);
               return (
@@ -199,7 +199,7 @@ function CategoryForm({
           </p>
         ) : null}
 
-        <div className="flex items-center justify-between gap-2 pt-1">
+        <div className="flex items-center justify-between gap-2 sticky bottom-0 -mx-4 -mb-4 mt-1 border-t border-hairline bg-popover/95 px-4 py-3 backdrop-blur sm:-mb-4">
           {category && !category.system ? (
             <Button
               type="button"

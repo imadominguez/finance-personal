@@ -21,6 +21,7 @@ import {
   Section,
   Step,
 } from "@/components/marketing/sections";
+import { InstallButton } from "@/components/pwa/install-button";
 import { InstallPrompt } from "@/components/pwa/install-prompt";
 import { Button } from "@/components/ui/button";
 import { APP_NAME } from "@/lib/constants";
@@ -224,6 +225,13 @@ export default function LandingPage() {
               Entrás con tu cuenta desde el teléfono o la computadora y ves lo
               mismo. Se instala como app y se abre a pantalla completa.
             </FeatureCard>
+          </div>
+
+          <div className="mt-8 flex flex-col items-start gap-3">
+            <InstallButton />
+            <p className="text-xs text-muted-foreground">
+              También podés usarla desde el navegador, sin instalar nada.
+            </p>
           </div>
 
           <InstallPrompt className="mt-6 max-w-md" />

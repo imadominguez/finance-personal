@@ -35,8 +35,21 @@ La app se instala en el teléfono o el escritorio y se abre a pantalla completa.
   instaló ya sabe qué es, quiere ver sus números.
 - **Service worker** en `public/sw.js`, registrado después del `load` y solo en producción.
 - **Sin conexión** muestra `/sin-conexion`, que se recarga sola cuando vuelve la red.
-- **Invitación a instalar** con `beforeinstallprompt` en Chrome y Edge, e instrucciones
-  para iOS, donde Safari no lo implementa. Se puede descartar y no vuelve a molestar.
+- **Botón de instalar** en Ajustes, en la landing y en el menú de usuario. El evento
+  `beforeinstallprompt` llega una sola vez por carga, así que lo captura un provider en el
+  layout raíz (`components/pwa/install-provider.tsx`) y desde ahí lo consume cualquier
+  pantalla. Cuando el navegador no ofrece instalador —Safari en iOS no lo implementa— el
+  botón abre las instrucciones concretas de esa plataforma en vez de no hacer nada.
+- **Invitación discreta** en la landing, descartable, que no vuelve a molestar.
+
+### Diálogos en pantallas chicas
+
+En mobile los diálogos son una hoja inferior: los formularios de esta app pasan los 700px
+de alto y, centrados, en un teléfono de 640 el encabezado quedaba cortado arriba del borde
+y no había forma de scrollear. Ahora el diálogo tiene tope de alto en `dvh` (que sí
+contempla el teclado abierto), el contenido scrollea por dentro, el botón de cerrar queda
+fijo en la esquina y la fila de acciones es pegajosa al pie. En `sm:` y más arriba vuelve a
+ser el modal centrado de siempre.
 
 ### Qué se cachea, y qué no
 

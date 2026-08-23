@@ -229,7 +229,7 @@ function TransactionForm({
         {/* Categoría */}
         <div className="flex flex-col gap-2">
           <Label>Categoría</Label>
-          <div className="grid max-h-44 grid-cols-2 gap-1.5 overflow-y-auto pr-1 pb-1 sm:grid-cols-3">
+          <div className="grid grid-cols-2 gap-1.5 pb-1 sm:max-h-44 sm:grid-cols-3 sm:overflow-y-auto sm:pr-1">
             {categories.map((category) => (
               <button
                 key={category.id}
@@ -317,7 +317,7 @@ function TransactionForm({
           </p>
         ) : null}
 
-        <div className="flex items-center justify-between gap-2 pt-1">
+        <div className="flex items-center justify-between gap-2 sticky bottom-0 -mx-4 -mb-4 mt-1 border-t border-hairline bg-popover/95 px-4 py-3 backdrop-blur sm:-mb-4">
           {isEditing ? (
             <Button type="button" variant="destructive" onClick={handleDelete}>
               <Trash2 />
