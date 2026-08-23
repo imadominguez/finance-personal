@@ -15,6 +15,7 @@ import {
 
 import { deleteAccountAction, logoutAction } from "@/app/actions/auth";
 import { SectionCard } from "@/components/finance/section-card";
+import { InstallButton } from "@/components/pwa/install-button";
 import { useFinanceReady } from "@/components/providers/finance-provider";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -169,6 +170,14 @@ export function AjustesView({ user }: AjustesViewProps) {
       </SectionCard>
 
       <SectionCard
+        title="Instalar la app"
+        description="Se abre a pantalla completa y queda con su ícono junto al resto de tus apps"
+        delay={100}
+      >
+        <InstallButton />
+      </SectionCard>
+
+      <SectionCard
         title="Moneda"
         description="Cómo se muestran los montos"
         delay={120}
@@ -253,6 +262,7 @@ export function AjustesView({ user }: AjustesViewProps) {
       </SectionCard>
 
       <SectionCard
+        id="cuenta"
         title="Tu cuenta"
         description={user?.email ?? ""}
         delay={240}

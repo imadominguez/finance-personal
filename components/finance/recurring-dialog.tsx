@@ -243,7 +243,7 @@ function RecurringForm({
           </p>
         ) : null}
 
-        <div className="flex items-center justify-between gap-2 pt-1">
+        <div className="flex items-center justify-between gap-2 sticky bottom-0 -mx-4 -mb-4 mt-1 border-t border-hairline bg-popover/95 px-4 py-3 backdrop-blur sm:-mb-4">
           {rule ? (
             <Button
               type="button"

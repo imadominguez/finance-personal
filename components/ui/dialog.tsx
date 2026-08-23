@@ -53,27 +53,54 @@ function DialogContent({
       <DialogPrimitive.Popup
         data-slot="dialog-content"
         className={cn(
-          "fixed top-1/2 left-1/2 z-50 grid w-full max-w-[calc(100%-2rem)] -translate-x-1/2 -translate-y-1/2 gap-4 rounded-xl bg-popover p-4 text-sm text-popover-foreground ring-1 ring-foreground/10 duration-100 outline-none sm:max-w-sm data-open:animate-in data-open:fade-in-0 data-open:zoom-in-95 data-closed:animate-out data-closed:fade-out-0 data-closed:zoom-out-95",
+          "fixed z-50 flex flex-col overflow-hidden bg-popover text-sm text-popover-foreground ring-1 ring-foreground/10 duration-150 outline-none",
+          /*
+           * Mobile: hoja inferior. El modal centrado no sirve en pantallas
+           * chicas: los formularios de esta app pasan los 700px de alto y en un
+           * teléfono de 640 el encabezado quedaba cortado arriba del borde, sin
+           * forma de scrollear. Anclado abajo, con tope de alto y scroll
+           * interno, siempre se llega a los botones, incluso con el teclado
+           * abierto (de ahí `dvh` y no `vh`).
+           */
+          "inset-x-0 bottom-0 max-h-[88dvh] w-full rounded-t-2xl",
+          "data-open:animate-in data-open:fade-in-0 data-open:slide-in-from-bottom-4",
+          "data-closed:animate-out data-closed:fade-out-0 data-closed:slide-out-to-bottom-4",
+          // Escritorio: el modal centrado de siempre, también con tope de alto.
+          "sm:inset-x-auto sm:top-1/2 sm:bottom-auto sm:left-1/2 sm:max-h-[85dvh] sm:max-w-sm sm:-translate-x-1/2 sm:-translate-y-1/2 sm:rounded-xl",
+          "sm:data-open:zoom-in-95 sm:data-open:slide-in-from-bottom-0 sm:data-closed:zoom-out-95 sm:data-closed:slide-out-to-bottom-0",
           className,
         )}
         {...props}
       >
-        {children}
+        {/* Tirador: le da a la hoja el gesto conocido de "esto se arrastra". */}
+        <span
+          aria-hidden="true"
+          className="mx-auto mt-2 h-1 w-9 shrink-0 rounded-full bg-hairline sm:hidden"
+        />
+
         {showCloseButton && (
           <DialogPrimitive.Close
             data-slot="dialog-close"
             render={
               <Button
                 variant="ghost"
-                className="absolute top-2 right-2"
+                className="absolute top-2 right-2 z-10"
                 size="icon-sm"
               />
             }
           >
             <XIcon />
-            <span className="sr-only">Close</span>
+            <span className="sr-only">Cerrar</span>
           </DialogPrimitive.Close>
         )}
+
+        {/*
+          El que scrollea es el contenido, no el diálogo: así el botón de cerrar
+          queda siempre a la vista en la esquina.
+        */}
+        <div className="flex flex-col gap-4 overflow-y-auto overscroll-contain p-4 pb-[max(1rem,env(safe-area-inset-bottom))] sm:pb-4">
+          {children}
+        </div>
       </DialogPrimitive.Popup>
     </DialogPortal>
   );

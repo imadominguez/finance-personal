@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Inter, JetBrains_Mono } from "next/font/google";
 
+import { InstallProvider } from "@/components/pwa/install-provider";
 import { ServiceWorkerRegistration } from "@/components/pwa/service-worker";
 import { APP_NAME } from "@/lib/constants";
 import { getSiteUrl } from "@/lib/site";
@@ -71,7 +72,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       suppressHydrationWarning
     >
       <body className="min-h-full">
-        {children}
+        <InstallProvider>{children}</InstallProvider>
         <ServiceWorkerRegistration />
       </body>
     </html>
