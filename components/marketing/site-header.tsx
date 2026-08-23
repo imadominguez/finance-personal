@@ -26,6 +26,17 @@ export function MarketingHeader() {
           </Button>
         </nav>
       </div>
+
+      {/*
+        Avance de lectura. Va atado al scroll del documento con CSS puro; sin
+        soporte queda en scaleX(0), o sea invisible, que es la degradación
+        correcta para un adorno.
+      */}
+      <span
+        aria-hidden="true"
+        className="avance-lectura absolute inset-x-0 bottom-0 h-px origin-left bg-gradient-to-r from-brand to-brand-light"
+        style={{ transform: "scaleX(0)" }}
+      />
     </header>
   );
 }

@@ -26,6 +26,27 @@ Atajo: la tecla **`n`** abre el alta de movimiento desde cualquier pantalla.
 `/` es la landing pública; el resumen del día vive en `/hoy`. Con la sesión iniciada, `/`
 redirige directo a `/hoy`.
 
+## Movimiento de la landing
+
+Las secciones se revelan y las capas de fondo se desplazan **a medida que
+scrolleás**, no al cargar. Está hecho con `animation-timeline: view()`, que ata el
+progreso de la animación a la posición del elemento en pantalla: lo maneja el
+navegador en el compositor, sin escuchar el evento `scroll` ni recalcular en cada
+cuadro. Eso es lo que separa un parallax fluido de uno que traba.
+
+El escalonado de las grillas sale gratis: cada tarjeta tiene su propia línea de
+tiempo según dónde está, así que aparecen una tras otra sin delays fijos que se
+desincronizan cuando cambia el contenido.
+
+Tres degradaciones, todas verificadas:
+
+- **Sin soporte** (`@supports`): la página se ve completa y quieta. El estado por
+  defecto es visible, así que un navegador viejo nunca muestra secciones en blanco.
+- **`prefers-reduced-motion`**: no se aplica ninguna de estas animaciones. Quien
+  pidió menos movimiento no debería recibir justo lo contrario al hacer scroll.
+- **Al imprimir**: no hay scroll, así que sin una regla explícita media landing
+  saldría en blanco. `@media print` fuerza todo a visible.
+
 ## El video de la landing
 
 El explicativo de la portada no es una grabación de pantalla: es **HTML y CSS

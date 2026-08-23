@@ -21,6 +21,7 @@ import {
   FeatureCard,
   Section,
   Step,
+  Steps,
 } from "@/components/marketing/sections";
 import { InstallButton } from "@/components/pwa/install-button";
 import { InstallPrompt } from "@/components/pwa/install-prompt";
@@ -55,7 +56,7 @@ export default function LandingPage() {
 
       <main className="flex-1">
         {/* Hero */}
-        <section className="mx-auto w-full max-w-5xl px-4 pt-14 pb-16 sm:pt-20">
+        <section className="mx-auto w-full max-w-5xl px-4 pt-12 pb-14 sm:pt-16 sm:pb-16">
           <div className="flex flex-col items-center gap-12 lg:flex-row lg:items-center lg:gap-16">
             <div className="max-w-xl text-center lg:text-left">
               <p className="inline-flex animate-fade-down items-center gap-2 rounded-full border border-brand/25 bg-brand/10 px-3 py-1 text-xs font-medium text-brand">
@@ -64,7 +65,7 @@ export default function LandingPage() {
               </p>
 
               <h1
-                className="mt-5 animate-fade-up font-heading text-4xl leading-[1.1] font-bold tracking-tight sm:text-5xl"
+                className="mt-5 animate-fade-up font-heading text-4xl leading-[1.05] font-bold tracking-tight text-balance sm:text-5xl"
                 style={{ animationDelay: "60ms" }}
               >
                 ¿A dónde se fue{" "}
@@ -72,7 +73,7 @@ export default function LandingPage() {
               </h1>
 
               <p
-                className="mt-5 animate-fade-up text-base leading-relaxed text-muted-foreground sm:text-lg"
+                className="mt-5 animate-fade-up text-base leading-relaxed text-pretty text-muted-foreground sm:text-lg"
                 style={{ animationDelay: "120ms" }}
               >
                 Anotá lo que gastás en dos toques y {APP_NAME} arma solo el
@@ -130,16 +131,13 @@ export default function LandingPage() {
         {/* Qué hace */}
         <Section
           id="funciones"
+          parallax="lento"
           eyebrow="Qué podés hacer"
           title="Todo lo que necesitás para saber en qué gastás"
           description="Nada de funciones de banco. Lo que sirve para el día a día, bien hecho."
         >
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            <FeatureCard
-              icon={Sun}
-              title="El día, sin abrir nada más"
-              delay={0}
-            >
+          <div className="revelar-hijos grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            <FeatureCard icon={Sun} title="El día, sin abrir nada más">
               Cuánto llevás gastado hoy, comparado con tu promedio y con ayer. Y
               cuánto te queda por día para llegar a fin de mes.
             </FeatureCard>
@@ -147,36 +145,27 @@ export default function LandingPage() {
             <FeatureCard
               icon={PieChart}
               title="El mes, categoría por categoría"
-              delay={60}
             >
               El total, el avance contra tu sueldo, el ranking de categorías y
               el gasto día por día. La respuesta a “¿en qué se me fue?”.
             </FeatureCard>
 
-            <FeatureCard
-              icon={CalendarRange}
-              title="El año completo"
-              delay={120}
-            >
+            <FeatureCard icon={CalendarRange} title="El año completo">
               La tendencia mes a mes, tu mes más caro y el más barato, el
               promedio mensual y el peso de cada categoría en el año.
             </FeatureCard>
 
-            <FeatureCard icon={Repeat} title="Gastos fijos" delay={180}>
+            <FeatureCard icon={Repeat} title="Gastos fijos">
               Cargás el alquiler o los servicios una sola vez y aparecen solos
               todos los meses. Si un mes no lo pagaste, lo salteás y listo.
             </FeatureCard>
 
-            <FeatureCard
-              icon={CreditCard}
-              title="Compras en cuotas"
-              delay={240}
-            >
+            <FeatureCard icon={CreditCard} title="Compras en cuotas">
               Anotás el total y en cuántas cuotas. La app las reparte mes a mes
               y te muestra cuántas te quedan por pagar.
             </FeatureCard>
 
-            <FeatureCard icon={Target} title="Tu presupuesto" delay={300}>
+            <FeatureCard icon={Target} title="Tu presupuesto">
               Definís tu sueldo o el tope que te querés poner y una barra te
               muestra si vas adelantado o tranquilo para el mes.
             </FeatureCard>
@@ -186,53 +175,47 @@ export default function LandingPage() {
         {/* Cómo funciona */}
         <Section
           id="como-funciona"
+          parallax="contrario"
           eyebrow="Cómo funciona"
           title="Tres pasos y ya estás viendo tus números"
         >
-          <ol className="flex flex-col gap-8 sm:gap-10">
-            <Step number={1} title="Creá tu cuenta" delay={0}>
+          <Steps>
+            <Step number={1} title="Creá tu cuenta">
               Email y contraseña. Nada más. Arrancás con las categorías más
               usadas ya cargadas.
             </Step>
-            <Step number={2} title="Anotá lo que gastás" delay={80}>
+            <Step number={2} title="Anotá lo que gastás">
               Monto, categoría y listo. Los gastos fijos y las cuotas se cargan
               una sola vez y después se imputan solos.
             </Step>
-            <Step number={3} title="Mirá los resúmenes" delay={160}>
+            <Step number={3} title="Mirá los resúmenes">
               El día, el mes y el año se arman solos. Con gráficos,
               comparaciones contra el período anterior y una proyección de
               cierre de mes.
             </Step>
-          </ol>
+          </Steps>
         </Section>
 
         {/* Confianza */}
         <Section
           id="tus-datos"
+          parallax="lento"
           eyebrow="Tus datos"
           title="Son tuyos, y te los podés llevar"
           description="Una app de finanzas ve cosas privadas. Estas son las reglas."
         >
-          <div className="grid gap-4 sm:grid-cols-3">
-            <FeatureCard icon={Lock} title="Solo vos los ves" delay={0}>
+          <div className="revelar-hijos grid gap-4 sm:grid-cols-3">
+            <FeatureCard icon={Lock} title="Solo vos los ves">
               Cada cuenta está aislada: tus movimientos no se cruzan con los de
               nadie. Las contraseñas se guardan con hash, nunca en texto plano.
             </FeatureCard>
 
-            <FeatureCard
-              icon={Download}
-              title="Exportables cuando quieras"
-              delay={60}
-            >
+            <FeatureCard icon={Download} title="Exportables cuando quieras">
               Un botón te baja todo en un archivo JSON. Sin pedir permiso, sin
               trámites y sin quedarte atado a la app.
             </FeatureCard>
 
-            <FeatureCard
-              icon={Smartphone}
-              title="En todos tus dispositivos"
-              delay={120}
-            >
+            <FeatureCard icon={Smartphone} title="En todos tus dispositivos">
               Entrás con tu cuenta desde el teléfono o la computadora y ves lo
               mismo. Se instala como app y se abre a pantalla completa.
             </FeatureCard>
@@ -254,25 +237,25 @@ export default function LandingPage() {
           eyebrow="Preguntas"
           title="Lo que se suele preguntar"
         >
-          <div className="flex max-w-3xl flex-col gap-3">
-            <Faq question="¿Cuánto cuesta?" delay={0}>
+          <div className="revelar-hijos flex max-w-3xl flex-col gap-3">
+            <Faq question="¿Cuánto cuesta?">
               Nada. No hay plan pago, ni prueba que vence, ni tarjeta.
             </Faq>
-            <Faq question="¿Se conecta con mi banco?" delay={60}>
+            <Faq question="¿Se conecta con mi banco?">
               No, y es a propósito: no te pedimos claves de home banking ni
               acceso a tus cuentas. Los movimientos los cargás vos, que es lo
               que hace que después los números te cierren.
             </Faq>
-            <Faq question="¿Puedo usarla en otra moneda?" delay={120}>
+            <Faq question="¿Puedo usarla en otra moneda?">
               Sí. En Ajustes elegís la moneda y todos los montos se muestran con
               el formato que corresponde.
             </Faq>
-            <Faq question="¿Qué pasa si me quedo sin internet?" delay={180}>
+            <Faq question="¿Qué pasa si me quedo sin internet?">
               La app avisa que no hay conexión y se recupera sola cuando vuelve.
               Para cargar y ver movimientos necesita red, porque tus datos viven
               en tu cuenta y no en el teléfono.
             </Faq>
-            <Faq question="¿Puedo borrar todo?" delay={240}>
+            <Faq question="¿Puedo borrar todo?">
               Sí. Podés borrar tus movimientos y dejar la cuenta vacía, o
               eliminar la cuenta entera. En ese caso no queda nada guardado.
             </Faq>
@@ -281,13 +264,13 @@ export default function LandingPage() {
 
         {/* Cierre */}
         <section className="mx-auto w-full max-w-5xl px-4 pb-20">
-          <div className="surface-card relative animate-fade-up overflow-hidden rounded-3xl px-6 py-14 text-center">
+          <div className="surface-card revelar relative overflow-hidden rounded-3xl px-6 py-14 text-center">
             <div
               aria-hidden="true"
               className="pointer-events-none absolute -top-24 left-1/2 size-72 -translate-x-1/2 animate-glow rounded-full bg-brand/25 blur-3xl"
             />
             <div className="relative">
-              <h2 className="font-heading text-2xl font-bold tracking-tight sm:text-3xl">
+              <h2 className="font-heading text-2xl font-bold tracking-tight text-balance sm:text-3xl">
                 Empezá hoy y en un mes vas a saber en qué se te va
               </h2>
               <p className="mx-auto mt-3 max-w-md text-sm text-muted-foreground">
