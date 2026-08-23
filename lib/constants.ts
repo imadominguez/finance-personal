@@ -96,9 +96,8 @@ export const CATEGORY_COLORS = [
  * Categorías con las que arranca la app. Salen de DESIGN.md y cubren el uso
  * típico del día a día; el usuario puede editarlas o agregar las suyas.
  */
-export const SEED_CATEGORIES: Category[] = [
+export const SEED_CATEGORIES: Omit<Category, "id">[] = [
   {
-    id: "cat-alquiler",
     name: "Alquiler",
     kind: "gasto",
     color: "#e85d24",
@@ -106,7 +105,6 @@ export const SEED_CATEGORIES: Category[] = [
     system: true,
   },
   {
-    id: "cat-supermercado",
     name: "Supermercado",
     kind: "gasto",
     color: "#ff8c42",
@@ -114,7 +112,6 @@ export const SEED_CATEGORIES: Category[] = [
     system: true,
   },
   {
-    id: "cat-delivery",
     name: "Delivery y salidas",
     kind: "gasto",
     color: "#d97634",
@@ -122,7 +119,6 @@ export const SEED_CATEGORIES: Category[] = [
     system: true,
   },
   {
-    id: "cat-cuotas",
     name: "Cuotas tarjeta",
     kind: "gasto",
     color: "#c45628",
@@ -130,7 +126,6 @@ export const SEED_CATEGORIES: Category[] = [
     system: true,
   },
   {
-    id: "cat-servicios",
     name: "Servicios",
     kind: "gasto",
     color: "#f0a070",
@@ -138,7 +133,6 @@ export const SEED_CATEGORIES: Category[] = [
     system: true,
   },
   {
-    id: "cat-transporte",
     name: "Transporte",
     kind: "gasto",
     color: "#e8956b",
@@ -146,35 +140,30 @@ export const SEED_CATEGORIES: Category[] = [
     system: true,
   },
   {
-    id: "cat-salud",
     name: "Salud",
     kind: "gasto",
     color: "#14b8a6",
     icon: "Stethoscope",
   },
   {
-    id: "cat-ocio",
     name: "Ocio",
     kind: "gasto",
     color: "#a855f7",
     icon: "Popcorn",
   },
   {
-    id: "cat-ropa",
     name: "Ropa",
     kind: "gasto",
     color: "#3b82f6",
     icon: "Shirt",
   },
   {
-    id: "cat-educacion",
     name: "Educación",
     kind: "gasto",
     color: "#f59e0b",
     icon: "GraduationCap",
   },
   {
-    id: "cat-otros",
     name: "Otros",
     kind: "gasto",
     color: "#a8a8a8",
@@ -182,7 +171,6 @@ export const SEED_CATEGORIES: Category[] = [
     system: true,
   },
   {
-    id: "cat-sueldo",
     name: "Sueldo",
     kind: "ingreso",
     color: "#10b981",
@@ -190,14 +178,12 @@ export const SEED_CATEGORIES: Category[] = [
     system: true,
   },
   {
-    id: "cat-freelance",
     name: "Freelance",
     kind: "ingreso",
     color: "#34d399",
     icon: "Briefcase",
   },
   {
-    id: "cat-extras",
     name: "Extras",
     kind: "ingreso",
     color: "#6ee7b7",

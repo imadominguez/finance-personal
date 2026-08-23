@@ -1,9 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Inter, JetBrains_Mono } from "next/font/google";
 
-import { AppShell } from "@/components/layout/app-shell";
-import { FinanceProvider } from "@/components/providers/finance-provider";
-import { TooltipProvider } from "@/components/ui/tooltip";
 import { APP_NAME } from "@/lib/constants";
 import "./globals.css";
 
@@ -43,13 +40,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       className={`dark ${sans.variable} ${mono.variable} h-full antialiased`}
       suppressHydrationWarning
     >
-      <body className="min-h-full">
-        <FinanceProvider>
-          <TooltipProvider>
-            <AppShell>{children}</AppShell>
-          </TooltipProvider>
-        </FinanceProvider>
-      </body>
+      <body className="min-h-full">{children}</body>
     </html>
   );
 }

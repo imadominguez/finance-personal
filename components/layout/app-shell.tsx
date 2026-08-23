@@ -5,8 +5,9 @@ import Link from "next/link";
 import { Plus, Wallet } from "lucide-react";
 
 import { MainNav } from "@/components/layout/main-nav";
+import { UserMenu } from "@/components/layout/user-menu";
 import { TransactionDialog } from "@/components/finance/transaction-dialog";
-import { FinanceGate } from "@/components/providers/finance-gate";
+import { ErrorToast } from "@/components/layout/error-toast";
 import { Button } from "@/components/ui/button";
 import { APP_NAME } from "@/lib/constants";
 
@@ -14,7 +15,13 @@ import { APP_NAME } from "@/lib/constants";
  * Marco de la app: cabecera pegajosa, navegación y el botón de carga rápida.
  * El diálogo de alta vive acá para poder abrirse desde cualquier pantalla.
  */
-export function AppShell({ children }: { children: React.ReactNode }) {
+export function AppShell({
+  user,
+  children,
+}: {
+  user: { email: string; name: string } | null;
+  children: React.ReactNode;
+}) {
   const [creating, setCreating] = React.useState(false);
 
   // Atajo: "n" abre el alta de movimiento (salvo mientras se escribe en un campo).
@@ -52,15 +59,18 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               </span>
             </Link>
 
-            <Button
-              size="lg"
-              onClick={() => setCreating(true)}
-              className="gap-1.5 transition-transform duration-200 hover:-translate-y-px active:translate-y-0 motion-reduce:hover:translate-y-0"
-            >
-              <Plus />
-              <span className="hidden sm:inline">Nuevo movimiento</span>
-              <span className="sm:hidden">Nuevo</span>
-            </Button>
+            <div className="flex items-center gap-2">
+              <Button
+                size="lg"
+                onClick={() => setCreating(true)}
+                className="gap-1.5 transition-transform duration-200 hover:-translate-y-px active:translate-y-0 motion-reduce:hover:translate-y-0"
+              >
+                <Plus />
+                <span className="hidden sm:inline">Nuevo movimiento</span>
+                <span className="sm:hidden">Nuevo</span>
+              </Button>
+              <UserMenu user={user} />
+            </div>
           </div>
 
           <MainNav className="pb-2" />
@@ -68,11 +78,11 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       </header>
 
       <main className="mx-auto w-full max-w-3xl flex-1 px-4 pt-5 pb-24 sm:pb-10">
-        <FinanceGate>{children}</FinanceGate>
+        {children}
       </main>
 
       <footer className="mx-auto w-full max-w-3xl px-4 pr-24 pb-6 text-center text-xs text-muted-foreground sm:pr-4">
-        Tus datos se guardan solo en este dispositivo. Podés exportarlos desde{" "}
+        Tus datos están guardados en tu cuenta. Podés exportarlos desde{" "}
         <Link
           href="/ajustes"
           className="text-brand underline-offset-4 hover:underline"
@@ -92,9 +102,9 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         <Plus />
       </Button>
 
-      <FinanceGate>
-        <TransactionDialog open={creating} onOpenChange={setCreating} />
-      </FinanceGate>
+      <TransactionDialog open={creating} onOpenChange={setCreating} />
+
+      <ErrorToast />
     </div>
   );
 }

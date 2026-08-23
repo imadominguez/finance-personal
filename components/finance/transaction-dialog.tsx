@@ -178,7 +178,7 @@ function TransactionForm({
         <DialogDescription>
           {isEditing
             ? "Cambiá lo que necesites y guardá."
-            : "Cargá lo que gastaste o cobraste. Se guarda en este dispositivo."}
+            : "Cargá lo que gastaste o cobraste."}
         </DialogDescription>
       </DialogHeader>
 

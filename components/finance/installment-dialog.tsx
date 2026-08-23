@@ -74,7 +74,7 @@ function InstallmentForm({
   const [categoryId, setCategoryId] = React.useState(
     () =>
       plan?.categoryId ??
-      categories.find((category) => category.id === "cat-cuotas")?.id ??
+      categories.find((category) => category.name === "Cuotas tarjeta")?.id ??
       categories[0]?.id ??
       "",
   );
