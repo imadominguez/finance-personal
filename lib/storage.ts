@@ -2,15 +2,29 @@ import {
   DEFAULT_SETTINGS,
   SEED_CATEGORIES,
   STATE_VERSION,
-  STORAGE_KEY,
 } from "@/lib/constants";
 import type { FinanceState } from "@/lib/types";
+
+/**
+ * Formato de respaldo de la app (exportar / importar JSON). Desde que los datos
+ * viven en Postgres esto ya no es la fuente de verdad: se usa para llevarse una
+ * copia, para restaurarla, y para migrar lo que quedó en el localStorage de la
+ * versión anterior.
+ */
+
+/** Clave que usaba la versión anterior de la app en el navegador. */
+export const LEGACY_STORAGE_KEY = "finanzas-personales:v1";
 
 export function createEmptyState(): FinanceState {
   return {
     version: STATE_VERSION,
     settings: { ...DEFAULT_SETTINGS },
-    categories: SEED_CATEGORIES.map((category) => ({ ...category })),
+    // Los ids reales los genera la base; acá solo hacen falta para que el
+    // JSON exportado sea autoconsistente.
+    categories: SEED_CATEGORIES.map((category, index) => ({
+      ...category,
+      id: `semilla-${index}`,
+    })),
     transactions: [],
     recurring: [],
     installments: [],
@@ -18,9 +32,9 @@ export function createEmptyState(): FinanceState {
 }
 
 /**
- * Normaliza lo que venga de localStorage o de un archivo importado. La app es
- * de un solo usuario y sin backend, así que acá es donde se garantiza que el
- * estado tenga forma válida antes de llegar a la UI.
+ * Normaliza lo que venga de un archivo importado o del localStorage viejo.
+ * Es la frontera con datos que no controlamos: acá se garantiza que el estado
+ * tenga forma válida antes de tocar la base.
  */
 export function normalizeState(input: unknown): FinanceState {
   const base = createEmptyState();
@@ -43,51 +57,34 @@ export function normalizeState(input: unknown): FinanceState {
   };
 }
 
-export function loadState(): FinanceState {
-  if (typeof window === "undefined") return createEmptyState();
-
-  try {
-    const raw = window.localStorage.getItem(STORAGE_KEY);
-    if (!raw) return createEmptyState();
-    return normalizeState(JSON.parse(raw));
-  } catch (error) {
-    console.error(
-      "No se pudo leer el estado guardado, se arranca de cero.",
-      error,
-    );
-    return createEmptyState();
-  }
-}
-
-export function saveState(state: FinanceState): void {
-  if (typeof window === "undefined") return;
-
-  try {
-    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-  } catch (error) {
-    // Cuota llena o modo privado: la app sigue andando en memoria.
-    console.error("No se pudo guardar el estado.", error);
-  }
-}
-
-export function clearState(): void {
-  if (typeof window === "undefined") return;
-  window.localStorage.removeItem(STORAGE_KEY);
-}
-
-/** Ids cortos y únicos sin dependencias extra. */
-export function createId(prefix: string): string {
-  const random =
-    typeof crypto !== "undefined" && "randomUUID" in crypto
-      ? crypto.randomUUID().slice(0, 8)
-      : Math.random().toString(36).slice(2, 10);
-  return `${prefix}-${Date.now().toString(36)}-${random}`;
-}
-
 export function stateToJson(state: FinanceState): string {
   return JSON.stringify(state, null, 2);
 }
 
-export function jsonToState(json: string): FinanceState {
-  return normalizeState(JSON.parse(json));
+/**
+ * Lee los datos que hayan quedado guardados en este navegador por la versión
+ * anterior de la app. Devuelve `null` si no hay nada que migrar.
+ */
+export function readLegacyLocalState(): string | null {
+  if (typeof window === "undefined") return null;
+
+  try {
+    const raw = window.localStorage.getItem(LEGACY_STORAGE_KEY);
+    if (!raw) return null;
+
+    const parsed = JSON.parse(raw) as Partial<FinanceState>;
+    const hasData =
+      (parsed.transactions?.length ?? 0) > 0 ||
+      (parsed.recurring?.length ?? 0) > 0 ||
+      (parsed.installments?.length ?? 0) > 0;
+
+    return hasData ? raw : null;
+  } catch {
+    return null;
+  }
+}
+
+export function clearLegacyLocalState(): void {
+  if (typeof window === "undefined") return;
+  window.localStorage.removeItem(LEGACY_STORAGE_KEY);
 }

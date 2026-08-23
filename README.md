@@ -3,9 +3,9 @@
 App de finanzas personales para llevar los gastos del **día**, del **mes** y del **año**.
 Registrás lo que gastás y lo que cobrás, y la app te dice en qué se te está yendo la plata.
 
-Construida con **Next.js 16 (App Router)**, **React 19**, **Tailwind CSS v4** y componentes
-**shadcn/ui** sobre Base UI. El diseño sigue `DESIGN.md`: dark mode, acentos naranja y
-animaciones suaves.
+Construida con **Next.js 16 (App Router)**, **React 19**, **Tailwind CSS v4**, componentes
+**shadcn/ui** sobre Base UI, y **PostgreSQL con Prisma 7**. El diseño sigue `DESIGN.md`:
+dark mode, acentos naranja y animaciones suaves.
 
 ## Qué hace
 
@@ -17,20 +17,44 @@ animaciones suaves.
 | `/movimientos` | Historial completo con filtros por texto, tipo, categoría y rango de fechas. |
 | `/fijos` | Gastos e ingresos fijos (alquiler, servicios, sueldo) y compras en cuotas. |
 | `/categorias` | ABM de categorías con color e ícono, y el acumulado del año de cada una. |
-| `/ajustes` | Presupuesto mensual, moneda, exportar/importar JSON y borrar todo. |
+| `/ajustes` | Presupuesto mensual, moneda, exportar/importar JSON, cuenta y borrado. |
+| `/ingresar`, `/crear-cuenta` | Acceso con email y contraseña. |
 
 Atajo: la tecla **`n`** abre el alta de movimiento desde cualquier pantalla.
 
-## Cómo se guardan los datos
+## Cuentas y datos
 
-Todo vive en **`localStorage` del navegador**. No hay backend, ni base de datos, ni cuentas:
-la app arranca con `pnpm dev` y funciona. Desde *Ajustes* podés exportar un JSON de
-respaldo e importarlo en otro dispositivo.
+Cada persona tiene su cuenta y ve **solo lo suyo**. Todas las tablas cuelgan de `User`, y
+ninguna consulta llega a la base sin pasar por el DAL (`lib/auth/dal.ts`), que es el único
+lugar donde se resuelve de quién son los datos.
 
-El acceso al almacenamiento está aislado detrás de dos módulos (`lib/storage.ts` y
-`lib/store.ts`) y toda la lógica de negocio es pura (`lib/finance.ts`), así que mover la
-persistencia a Prisma + PostgreSQL —como describe `.cursor/rules/`— es reemplazar esa capa
-sin tocar las vistas.
+- **Contraseñas**: hash `scrypt` (Node core, sin binarios nativos que compliquen el deploy),
+  con salt por usuario y comparación en tiempo constante.
+- **Sesiones**: se guardan en la tabla `sessions`; el navegador solo recibe el id firmado
+  (JWT con `jose`) en una cookie `httpOnly`, `sameSite=lax` y `secure` en producción.
+- **`proxy.ts`** hace un chequeo optimista para redirigir al login sin consultar la base en
+  cada navegación. La verificación real, contra la tabla de sesiones, vive en el DAL.
+- Cada Server Action valida su entrada con **Zod** y filtra por `userId`: una acción es un
+  endpoint público, así que nada se escribe confiando en lo que mande el cliente.
+
+Borrar la cuenta elimina en cascada todos sus movimientos, categorías, fijos y cuotas.
+
+## Cómo hablan las pantallas con la base
+
+El layout de la zona autenticada lee **todo el estado del usuario en el servidor** y se lo
+pasa al `FinanceProvider`. Gracias a eso, la lógica de negocio (`lib/finance.ts`) y las
+siete vistas siguen trabajando con la misma forma de datos que cuando esto guardaba en
+`localStorage`, y los cálculos de día/mes/año, los filtros y los gráficos siguen siendo
+instantáneos.
+
+Las mutaciones son **Server Actions**. Cada una aplica primero un cambio optimista en
+pantalla (`useOptimistic` + `useTransition`) y después escribe en Postgres; al revalidar,
+React reemplaza la copia optimista por los datos reales. Si el servidor rechaza el cambio,
+la pantalla vuelve sola al estado correcto y aparece un aviso con el motivo.
+
+Traer el estado completo es razonable para una app personal (miles de filas como mucho). Si
+alguna vez crece, el corte natural es paginar `/movimientos` y calcular los totales del año
+con agregaciones en SQL.
 
 ### Fijos y cuotas: proyectados, no duplicados
 
@@ -44,41 +68,80 @@ listas y punteadas en los gráficos, para no confundir lo que ya pasó con lo qu
 
 ## Cómo correrlo
 
+Necesitás una base PostgreSQL. Podés levantar una local o usar la de Vercel (ver más abajo).
+
 ```bash
 pnpm install
-pnpm dev          # http://localhost:3000
+cp .env.example .env          # completá DATABASE_URL y SESSION_SECRET
+openssl rand -base64 32       # para SESSION_SECRET
+pnpm db:migrate               # crea las tablas
+pnpm dev                      # http://localhost:3000
 ```
 
 Otros comandos:
 
 ```bash
-pnpm build        # build de producción
+pnpm build        # prisma generate + build de producción
 pnpm start        # servir el build
 pnpm lint         # eslint
+pnpm db:migrate   # crear y aplicar una migración en desarrollo
+pnpm db:deploy    # aplicar migraciones existentes (producción)
+pnpm db:studio    # explorar la base en el navegador
 ```
 
-La primera vez la app está vacía. Podés cargar tu primer gasto, o tocar **"Cargar datos de
-ejemplo"** para ver 12 meses de datos verosímiles y borrarlos después desde *Ajustes*.
+Creá tu cuenta en `/crear-cuenta`. Arranca con las categorías base; podés cargar tu primer
+gasto o tocar **"Cargar datos de ejemplo"** para ver 12 meses de datos verosímiles y
+borrarlos después desde *Ajustes*.
+
+### Si venías de la versión con localStorage
+
+Al entrar a *Ajustes* desde el mismo navegador que usabas antes, la app detecta los datos
+viejos y ofrece subirlos a tu cuenta con un botón. También podés importar a mano el JSON
+que hayas exportado.
+
+## Deploy en Vercel
+
+1. **Creá la base**: en el panel de tu proyecto, **Storage → Create Database → Postgres**.
+   Vercel la provisiona (Neon por debajo) y agrega `DATABASE_URL` al proyecto.
+2. **Agregá `SESSION_SECRET`** en *Settings → Environment Variables*, con el valor de
+   `openssl rand -base64 32`. Usá uno distinto al de desarrollo.
+3. **Deploy**. El `build` corre `prisma generate` solo.
+4. **Aplicá las migraciones** una vez, apuntando a la base de producción:
+
+   ```bash
+   DATABASE_URL="<la de Vercel>" pnpm db:deploy
+   ```
+
+   Si tu proveedor da una URL *pooled* y una *direct*, usá la **direct** para las migraciones
+   y la *pooled* para `DATABASE_URL` en runtime.
 
 ## Estructura
 
 ```
-app/                    Rutas del App Router (cada page.tsx es un Server Component
-                        que exporta metadata y monta su vista cliente)
+app/
+  (auth)/               Pantallas públicas: ingresar y crear cuenta
+  (app)/                Zona autenticada; su layout carga el estado del usuario
+  actions/              Server Actions (auth, movimientos, datos)
+proxy.ts                Chequeo optimista de sesión antes de cada navegación
+prisma/
+  schema.prisma         Modelo de datos
+  migrations/           Historial de migraciones
 components/
+  auth/                 Formulario de ingreso y alta
   charts/               Dona y barras, en SVG/CSS y animadas con Tailwind
   finance/              Piezas del dominio: hero, desglose, listas, diálogos
-  layout/               Marco de la app y navegación
-  providers/            Contexto de estado y gate de hidratación
+  layout/               Marco de la app, navegación y menú de usuario
+  providers/            Estado del cliente sobre el estado del servidor
   ui/                   Primitivas shadcn/ui (Base UI)
 lib/
-  types.ts              Modelo de datos
+  auth/                 Sesiones, hash de contraseñas y DAL
+  db/                   Cliente Prisma, consultas, mapeos y datos de ejemplo
+  validation/           Schemas Zod de todo lo que entra desde el cliente
+  types.ts              Modelo de datos de la interfaz
   finance.ts            Lógica de negocio pura (expansión, totales, presupuesto)
   date.ts               Períodos y formato de fechas en español
   format.ts             Moneda, porcentajes y parseo de montos
-  store.ts              Store externo sobre localStorage (useSyncExternalStore)
-  storage.ts            Lectura/escritura y normalización del estado
-  sample-data.ts        Generador de datos de ejemplo
+  storage.ts            Formato de respaldo JSON y lectura del localStorage viejo
 ```
 
 ## Decisiones que vale la pena conocer
@@ -94,3 +157,9 @@ lib/
   `prefers-reduced-motion`.
 - **Números que no bailan.** Los montos usan `font-variant-numeric: tabular-nums` y se
   animan con un contador que también respeta `prefers-reduced-motion`.
+- **Plata en `Decimal`, no en `Float`.** Los montos se guardan como `Decimal(14,2)`: con
+  dinero los errores de punto flotante no son aceptables. La conversión a `number` ocurre
+  en un solo lugar (`lib/db/mappers.ts`).
+- **Fechas como días del calendario.** Un movimiento ocurre un día, no en un instante: se
+  guarda en una columna `date` a medianoche UTC, así la zona horaria del servidor nunca
+  corre el día.

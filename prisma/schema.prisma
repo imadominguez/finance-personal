@@ -1,0 +1,180 @@
+// Modelo de datos de la app de finanzas personales.
+// Todo lo que pertenece a una persona cuelga de `User` con onDelete: Cascade,
+// así borrar la cuenta se lleva sus datos sin dejar huérfanos.
+
+generator client {
+  provider = "prisma-client"
+  output   = "../lib/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum MovementKind {
+  gasto
+  ingreso
+}
+
+enum PaymentMethod {
+  efectivo
+  debito
+  credito
+  transferencia
+  otro
+}
+
+model User {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  /// Hash scrypt en formato `salt:hash`. Nunca se expone al cliente.
+  passwordHash String
+  name         String   @default("")
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  settings     Settings?
+  sessions     Session[]
+  categories   Category[]
+  transactions Transaction[]
+  recurring    RecurringRule[]
+  installments InstallmentPlan[]
+
+  @@map("users")
+}
+
+model Session {
+  id        String   @id @default(cuid())
+  userId    String
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([expiresAt])
+  @@map("sessions")
+}
+
+model Settings {
+  id     String @id @default(cuid())
+  userId String @unique
+
+  /// Sueldo o tope mensual de referencia. 0 = sin barra de avance.
+  monthlyBudget Decimal @default(0) @db.Decimal(14, 2)
+  currency      String  @default("ARS")
+  locale        String  @default("es-AR")
+  displayName   String  @default("")
+
+  updatedAt DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("settings")
+}
+
+model Category {
+  id     String @id @default(cuid())
+  userId String
+
+  name  String
+  kind  MovementKind
+  color String
+  icon  String
+  /// Las categorías semilla se pueden renombrar pero no borrar.
+  system Boolean @default(false)
+
+  createdAt DateTime @default(now())
+
+  user         User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  transactions Transaction[]
+  recurring    RecurringRule[]
+  installments InstallmentPlan[]
+
+  @@unique([userId, name, kind])
+  @@index([userId])
+  @@map("categories")
+}
+
+model Transaction {
+  id     String @id @default(cuid())
+  userId String
+
+  kind   MovementKind
+  /// Siempre positivo: el signo lo define `kind`. Decimal, no Float:
+  /// con plata los errores de punto flotante no son aceptables.
+  amount Decimal      @db.Decimal(14, 2)
+
+  categoryId  String
+  description String
+  /// Fecha local del movimiento, sin hora: es un día del calendario.
+  date        DateTime      @db.Date
+  method      PaymentMethod @default(efectivo)
+  note        String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  category Category @relation(fields: [categoryId], references: [id], onDelete: Restrict)
+
+  @@index([userId, date])
+  @@index([categoryId])
+  @@map("transactions")
+}
+
+/// Gasto o ingreso que se repite todos los meses. No materializa movimientos:
+/// se proyecta al leer cada período (ver lib/finance.ts).
+model RecurringRule {
+  id     String @id @default(cuid())
+  userId String
+
+  kind        MovementKind
+  description String
+  categoryId  String
+  amount      Decimal      @db.Decimal(14, 2)
+  /// 1-31; si el mes es más corto se ajusta al último día.
+  dayOfMonth  Int
+  /// `YYYY-MM` en que arranca.
+  startMonth  String
+  /// `YYYY-MM` en que termina (inclusive). null = sin fin.
+  endMonth    String?
+  active      Boolean      @default(true)
+  /// Meses `YYYY-MM` salteados puntualmente.
+  skipped     String[]     @default([])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  category Category @relation(fields: [categoryId], references: [id], onDelete: Restrict)
+
+  @@index([userId])
+  @@index([categoryId])
+  @@map("recurring_rules")
+}
+
+/// Compra en N cuotas. Tampoco se materializa: se proyecta al leer.
+model InstallmentPlan {
+  id     String @id @default(cuid())
+  userId String
+
+  description  String
+  categoryId   String
+  totalAmount  Decimal       @db.Decimal(14, 2)
+  installments Int
+  /// `YYYY-MM` de la primera cuota.
+  firstMonth   String
+  dayOfMonth   Int
+  method       PaymentMethod @default(credito)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  category Category @relation(fields: [categoryId], references: [id], onDelete: Restrict)
+
+  @@index([userId])
+  @@index([categoryId])
+  @@map("installment_plans")
+}

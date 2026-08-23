@@ -1,8 +1,19 @@
 "use client";
 
 import * as React from "react";
-import { Check, Download, RotateCcw, Sparkles, Upload } from "lucide-react";
+import {
+  Check,
+  Download,
+  HardDriveDownload,
+  Loader2,
+  LogOut,
+  RotateCcw,
+  Sparkles,
+  Trash2,
+  Upload,
+} from "lucide-react";
 
+import { deleteAccountAction, logoutAction } from "@/app/actions/auth";
 import { SectionCard } from "@/components/finance/section-card";
 import { useFinanceReady } from "@/components/providers/finance-provider";
 import { Button } from "@/components/ui/button";
@@ -14,12 +25,26 @@ import {
 } from "@/components/ui/native-select";
 import { CURRENCIES } from "@/lib/constants";
 import { formatMoney, parseAmountInput } from "@/lib/format";
-import { jsonToState, stateToJson } from "@/lib/storage";
+import {
+  clearLegacyLocalState,
+  readLegacyLocalState,
+  stateToJson,
+} from "@/lib/storage";
 
-/** Preferencias, respaldo de datos y borrado. */
-export function AjustesView() {
-  const { state, updateSettings, replaceState, resetAll, loadSampleData } =
-    useFinanceReady();
+interface AjustesViewProps {
+  user: { email: string; name: string } | null;
+}
+
+/** Preferencias, respaldo de datos y cuenta. */
+export function AjustesView({ user }: AjustesViewProps) {
+  const {
+    state,
+    updateSettings,
+    importState,
+    resetAll,
+    loadSampleData,
+    pending,
+  } = useFinanceReady();
 
   const [budget, setBudget] = React.useState(
     String(state.settings.monthlyBudget || ""),
@@ -27,7 +52,9 @@ export function AjustesView() {
   const [name, setName] = React.useState(state.settings.displayName);
   const [saved, setSaved] = React.useState(false);
   const [importError, setImportError] = React.useState<string | null>(null);
+  const [importing, setImporting] = React.useState(false);
   const [confirmingReset, setConfirmingReset] = React.useState(false);
+  const [confirmingDelete, setConfirmingDelete] = React.useState(false);
   const fileInputRef = React.useRef<HTMLInputElement>(null);
 
   const parsedBudget = parseAmountInput(budget);
@@ -63,20 +90,24 @@ export function AjustesView() {
     URL.revokeObjectURL(url);
   }
 
-  async function handleImport(event: React.ChangeEvent<HTMLInputElement>) {
+  async function runImport(json: string, onSuccess?: () => void) {
+    setImporting(true);
+    setImportError(null);
+
+    const result = await importState(json);
+    if (result.ok) onSuccess?.();
+    else setImportError(result.error ?? "No se pudo importar el archivo");
+
+    setImporting(false);
+  }
+
+  async function handleImportFile(event: React.ChangeEvent<HTMLInputElement>) {
     const file = event.target.files?.[0];
     if (!file) return;
 
-    try {
-      const text = await file.text();
-      replaceState(jsonToState(text));
-      setImportError(null);
-    } catch {
-      setImportError("El archivo no tiene el formato esperado.");
-    } finally {
-      // Permite volver a elegir el mismo archivo.
-      event.target.value = "";
-    }
+    await runImport(await file.text());
+    // Permite volver a elegir el mismo archivo.
+    event.target.value = "";
   }
 
   return (
@@ -86,9 +117,11 @@ export function AjustesView() {
           Ajustes
         </h1>
         <p className="mt-1 text-sm text-muted-foreground">
-          Tu presupuesto, la moneda y el respaldo de tus datos.
+          Tu presupuesto, la moneda, tus datos y tu cuenta.
         </p>
       </header>
+
+      <LegacyImportCard onImport={runImport} importing={importing} />
 
       <SectionCard
         title="Presupuesto mensual"
@@ -123,7 +156,12 @@ export function AjustesView() {
             />
           </div>
 
-          <Button type="submit" size="lg" className="self-start">
+          <Button
+            type="submit"
+            size="lg"
+            disabled={pending}
+            className="self-start"
+          >
             {saved ? <Check /> : null}
             {saved ? "Guardado" : "Guardar cambios"}
           </Button>
@@ -157,7 +195,7 @@ export function AjustesView() {
 
       <SectionCard
         title="Tus datos"
-        description="Todo se guarda en este navegador. Exportá para tener un respaldo o pasarlo a otro dispositivo."
+        description="Están guardados en tu cuenta. Exportá un JSON para tener un respaldo."
         delay={180}
       >
         <div className="flex flex-col gap-3">
@@ -170,9 +208,10 @@ export function AjustesView() {
             <Button
               variant="outline"
               size="lg"
+              disabled={importing}
               onClick={() => fileInputRef.current?.click()}
             >
-              <Upload />
+              {importing ? <Loader2 className="animate-spin" /> : <Upload />}
               Importar JSON
             </Button>
 
@@ -180,15 +219,24 @@ export function AjustesView() {
               ref={fileInputRef}
               type="file"
               accept="application/json"
-              onChange={handleImport}
+              onChange={handleImportFile}
               className="hidden"
             />
 
-            <Button variant="outline" size="lg" onClick={loadSampleData}>
+            <Button
+              variant="outline"
+              size="lg"
+              disabled={pending}
+              onClick={loadSampleData}
+            >
               <Sparkles />
               Cargar datos de ejemplo
             </Button>
           </div>
+
+          <p className="text-xs text-muted-foreground">
+            Importar reemplaza todo lo que tengas cargado.
+          </p>
 
           {importError ? (
             <p className="animate-fade-in rounded-lg border border-destructive/30 bg-destructive/10 px-3 py-2 text-xs text-destructive">
@@ -205,42 +253,179 @@ export function AjustesView() {
       </SectionCard>
 
       <SectionCard
-        title="Borrar todo"
-        description="Elimina movimientos, fijos, cuotas y preferencias de este dispositivo"
+        title="Tu cuenta"
+        description={user?.email ?? ""}
         delay={240}
+      >
+        <div className="flex flex-wrap gap-2">
+          <form action={logoutAction}>
+            <Button type="submit" variant="outline" size="lg">
+              <LogOut />
+              Cerrar sesión
+            </Button>
+          </form>
+        </div>
+      </SectionCard>
+
+      <SectionCard
+        title="Zona de riesgo"
+        description="Estas acciones no se pueden deshacer"
+        delay={300}
         className="border-destructive/25"
       >
-        {confirmingReset ? (
-          <div className="flex animate-fade-in flex-col gap-3 rounded-xl border border-destructive/30 bg-destructive/10 p-3">
-            <p className="text-sm text-destructive">
-              Esto no se puede deshacer. ¿Seguro que querés borrar todo?
-            </p>
-            <div className="flex gap-2">
-              <Button
-                variant="destructive"
-                onClick={() => {
-                  resetAll();
-                  setConfirmingReset(false);
-                }}
-              >
-                <RotateCcw />
-                Sí, borrar todo
-              </Button>
-              <Button variant="ghost" onClick={() => setConfirmingReset(false)}>
-                Cancelar
-              </Button>
-            </div>
-          </div>
-        ) : (
-          <Button
-            variant="destructive"
-            onClick={() => setConfirmingReset(true)}
-          >
-            <RotateCcw />
-            Borrar todos mis datos
-          </Button>
-        )}
+        <div className="flex flex-col gap-4">
+          {confirmingReset ? (
+            <Confirm
+              message="Se borran todos tus movimientos, fijos y cuotas. Tu cuenta sigue existiendo."
+              confirmLabel="Sí, borrar mis datos"
+              icon={RotateCcw}
+              onConfirm={() => {
+                resetAll();
+                setConfirmingReset(false);
+              }}
+              onCancel={() => setConfirmingReset(false)}
+            />
+          ) : (
+            <Button
+              variant="destructive"
+              disabled={pending}
+              onClick={() => setConfirmingReset(true)}
+              className="self-start"
+            >
+              <RotateCcw />
+              Borrar todos mis datos
+            </Button>
+          )}
+
+          {confirmingDelete ? (
+            <form action={deleteAccountAction}>
+              <div className="flex animate-fade-in flex-col gap-3 rounded-xl border border-destructive/30 bg-destructive/10 p-3">
+                <p className="text-sm text-destructive">
+                  Se elimina tu cuenta y todo lo que tengas cargado. No hay
+                  vuelta atrás.
+                </p>
+                <div className="flex gap-2">
+                  <Button type="submit" variant="destructive">
+                    <Trash2 />
+                    Sí, eliminar mi cuenta
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    onClick={() => setConfirmingDelete(false)}
+                  >
+                    Cancelar
+                  </Button>
+                </div>
+              </div>
+            </form>
+          ) : (
+            <Button
+              variant="destructive"
+              onClick={() => setConfirmingDelete(true)}
+              className="self-start"
+            >
+              <Trash2 />
+              Eliminar mi cuenta
+            </Button>
+          )}
+        </div>
       </SectionCard>
+    </div>
+  );
+}
+
+/**
+ * Aparece solo si este navegador todavía tiene datos de la versión anterior
+ * (la que guardaba en localStorage), para poder subirlos a la cuenta.
+ */
+function LegacyImportCard({
+  onImport,
+  importing,
+}: {
+  onImport: (json: string, onSuccess?: () => void) => Promise<void>;
+  importing: boolean;
+}) {
+  // localStorage es una fuente externa a React y no existe en el servidor:
+  // `useSyncExternalStore` la lee sin provocar un render en cascada y devuelve
+  // `null` durante el render del servidor, así no hay desajuste de hidratación.
+  const legacy = React.useSyncExternalStore(
+    subscribeToNothing,
+    readLegacyLocalState,
+    () => null,
+  );
+  const [done, setDone] = React.useState(false);
+
+  if (!legacy || done) return null;
+
+  return (
+    <SectionCard
+      title="Tenés datos guardados en este navegador"
+      description="Son de la versión anterior de la app, la que guardaba todo en este dispositivo."
+      className="border-brand/40"
+    >
+      <div className="flex flex-col gap-3">
+        <p className="text-sm text-muted-foreground">
+          Podés subirlos a tu cuenta para tenerlos en cualquier dispositivo.
+          Esto reemplaza lo que tengas cargado ahora.
+        </p>
+        <div className="flex flex-wrap gap-2">
+          <Button
+            size="lg"
+            disabled={importing}
+            onClick={() =>
+              onImport(legacy, () => {
+                clearLegacyLocalState();
+                setDone(true);
+              })
+            }
+          >
+            {importing ? (
+              <Loader2 className="animate-spin" />
+            ) : (
+              <HardDriveDownload />
+            )}
+            Subir esos datos a mi cuenta
+          </Button>
+          <Button variant="ghost" size="lg" onClick={() => setDone(true)}>
+            Ahora no
+          </Button>
+        </div>
+      </div>
+    </SectionCard>
+  );
+}
+
+/** El localStorage heredado no cambia mientras la pantalla está abierta. */
+function subscribeToNothing(): () => void {
+  return () => {};
+}
+
+function Confirm({
+  message,
+  confirmLabel,
+  icon: Icon,
+  onConfirm,
+  onCancel,
+}: {
+  message: string;
+  confirmLabel: string;
+  icon: React.ComponentType<{ className?: string }>;
+  onConfirm: () => void;
+  onCancel: () => void;
+}) {
+  return (
+    <div className="flex animate-fade-in flex-col gap-3 rounded-xl border border-destructive/30 bg-destructive/10 p-3">
+      <p className="text-sm text-destructive">{message}</p>
+      <div className="flex gap-2">
+        <Button variant="destructive" onClick={onConfirm}>
+          <Icon className="size-4" />
+          {confirmLabel}
+        </Button>
+        <Button variant="ghost" onClick={onCancel}>
+          Cancelar
+        </Button>
+      </div>
     </div>
   );
 }

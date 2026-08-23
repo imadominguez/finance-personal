@@ -4,7 +4,7 @@
 
 **Nombre**: Expense Tracker Bot
 **Descripción**: Aplicación personal para administrar gastos diarios, mensuales y anuales a través de WhatsApp.
-**Usuario**: Uso personal exclusivo
+**Usuario**: Multiusuario, con una cuenta por persona
 **Propósito Principal**: Capturar gastos via WhatsApp y visualizarlos en un dashboard inteligente.
 
 ## Cómo Funciona
@@ -83,17 +83,23 @@
 ## Equipo
 
 - **Desarrollador**: 1 persona (uso personal)
-- **Usuarios**: Solo el creador
+- **Usuarios**: Cada persona con su cuenta; los datos no se comparten entre cuentas
 
 ## Restricciones y Requisitos
 
+> **Actualizado**: la app pasó a ser **multiusuario con cuentas**. Cada persona se
+> registra con email y contraseña y ve solo sus datos; todas las tablas cuelgan de
+> `User`. Las contraseñas usan hash `scrypt` y las sesiones viven en la tabla
+> `sessions`, con el id firmado en una cookie `httpOnly`. Ver `README.md` y
+> `lib/auth/`.
+
 ❌ NO incluir:
 - Notificaciones de presupuesto
-- Multi-usuario
 - Sincronización en tiempo real
-- Autenticación compleja (solo localStorage por ahora)
+- Login con proveedores externos (OAuth): por ahora solo email y contraseña
 
 ✅ INCLUIR:
+- Cuentas de usuario con datos aislados por `userId`
 - Historial completo (todas las fechas)
 - Vistas por día, mes, año
 - Parseo flexible de mensajes
