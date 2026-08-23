@@ -1,0 +1,204 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Mis Finanzas — intro</title>
+<style>
+  @font-face {
+    font-family: Inter;
+    font-style: normal;
+    font-weight: 100 900;
+    font-display: block;
+    src: url(inter.woff2) format("woff2");
+  }
+
+  :root {
+    --bg: #0a0a0a;
+    --surface: #121212;
+    --raised: #1a1a1a;
+    --hairline: #2a2a2a;
+    --fg: #ffffff;
+    --fg2: #e8e8e8;
+    --muted: #a8a8a8;
+    --brand: #e85d24;
+    --brand-light: #ff6b35;
+    --brand-dark: #d64820;
+    --success: #10b981;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html, body {
+    width: 1280px; height: 720px; overflow: hidden;
+    background: var(--bg); color: var(--fg);
+    font-family: Inter, system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  #escenario { position: relative; width: 1280px; height: 720px; }
+
+  /* Halo de marca de fondo, común a todas las escenas */
+  #halo {
+    position: absolute; left: 50%; top: -220px; width: 900px; height: 900px;
+    transform: translateX(-50%); border-radius: 50%;
+    background: radial-gradient(circle, rgba(232,93,36,.28) 0%, transparent 62%);
+    filter: blur(30px); pointer-events: none;
+  }
+
+  .escena {
+    position: absolute; inset: 0;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    padding: 0 96px; opacity: 0; will-change: opacity, transform;
+  }
+
+  .titulo { font-size: 62px; font-weight: 700; letter-spacing: -.025em; line-height: 1.08; text-align: center; }
+  .titulo.chico { font-size: 46px; }
+  .bajada { margin-top: 20px; font-size: 24px; color: var(--muted); text-align: center; line-height: 1.5; }
+  .naranja {
+    background: linear-gradient(135deg, var(--brand-light), var(--brand) 55%, var(--brand-dark));
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+  }
+  .tabular { font-variant-numeric: tabular-nums; }
+
+  .etiqueta {
+    font-size: 15px; letter-spacing: .18em; text-transform: uppercase;
+    color: var(--brand); font-weight: 600;
+  }
+
+  /* Tarjeta genérica */
+  .tarjeta {
+    background: var(--surface); border: 1px solid var(--hairline);
+    border-radius: 22px; padding: 30px 34px;
+  }
+
+  .fila { display: flex; align-items: center; gap: 14px; }
+  .punto { width: 34px; height: 34px; border-radius: 11px; display: grid; place-items: center; flex: 0 0 auto; }
+  .punto svg { width: 18px; height: 18px; }
+  .barra { height: 7px; border-radius: 4px; background: var(--hairline); overflow: hidden; }
+  .barra > span { display: block; height: 100%; border-radius: 4px; }
+
+  .marca { display: flex; align-items: center; gap: 16px; }
+  .logo {
+    width: 76px; height: 76px; border-radius: 22px;
+    background: linear-gradient(135deg, var(--brand-light), var(--brand) 55%, var(--brand-dark));
+    display: grid; place-items: center;
+  }
+  .logo svg { width: 40px; height: 40px; stroke: #0a0a0a; }
+
+  .pildora {
+    display: inline-flex; align-items: center; gap: 10px;
+    border: 1px solid rgba(232,93,36,.3); background: rgba(232,93,36,.1);
+    color: var(--brand); border-radius: 999px; padding: 10px 20px; font-size: 17px; font-weight: 500;
+  }
+
+  .cta {
+    background: linear-gradient(135deg, var(--brand-light), var(--brand));
+    color: #0a0a0a; font-weight: 700; font-size: 22px;
+    border-radius: 14px; padding: 16px 34px; display: inline-block;
+  }
+
+  /* Teléfono para las escenas de producto */
+  .telefono {
+    width: 330px; border-radius: 34px; background: var(--surface);
+    border: 1px solid var(--hairline); padding: 22px 20px;
+    box-shadow: 0 40px 80px -30px rgba(0,0,0,.9);
+  }
+</style>
+</head>
+<body>
+<div id="escenario">
+  <div id="halo"></div>
+
+  <!-- 1. Enganche -->
+  <section class="escena" data-escena="hook">
+    <h1 class="titulo" data-anim="titulo">¿A dónde se fue<br><span class="naranja">tu sueldo</span>?</h1>
+  </section>
+
+  <!-- 2. El problema -->
+  <section class="escena" data-escena="problema">
+    <div style="display:flex;flex-direction:column;gap:22px;align-items:center">
+      <p class="titulo chico" data-linea="0">Cobrás.</p>
+      <p class="titulo chico" data-linea="1">Gastás todo el mes.</p>
+      <p class="titulo chico" data-linea="2">Y a fin de mes <span class="naranja">no sabés en qué</span>.</p>
+    </div>
+  </section>
+
+  <!-- 3. Cómo se usa -->
+  <section class="escena" data-escena="uso">
+    <p class="etiqueta" data-anim="etiqueta">Cómo se usa</p>
+    <h2 class="titulo chico" style="margin-top:14px" data-anim="titulo">Anotás lo que gastás, en dos toques</h2>
+    <div class="tarjeta" style="margin-top:38px;width:520px" data-anim="tarjeta">
+      <p style="font-size:14px;color:var(--muted);margin-bottom:8px">Monto</p>
+      <p class="tabular" style="font-size:44px;font-weight:700" data-anim="monto">$ 0</p>
+      <p style="font-size:14px;color:var(--muted);margin:22px 0 12px">Categoría</p>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px" data-anim="cats"></div>
+      <div style="margin-top:26px;display:flex;justify-content:flex-end">
+        <span class="cta" style="font-size:18px;padding:12px 26px" data-anim="boton">✓ Agregar</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- 4. El día -->
+  <section class="escena" data-escena="dia">
+    <div style="display:flex;align-items:center;gap:72px">
+      <div style="max-width:380px">
+        <p class="etiqueta">Tu día</p>
+        <h2 class="titulo chico" style="margin-top:14px">Cuánto llevás<br>gastado hoy</h2>
+        <p class="bajada" style="text-align:left;font-size:20px">Comparado con tu promedio, y cuánto te queda por día para llegar a fin de mes.</p>
+      </div>
+      <div class="telefono" data-anim="telefono">
+        <p style="font-size:17px;font-weight:700">¿Cuánto llevás gastado hoy?</p>
+        <p style="font-size:13px;color:var(--muted);margin-top:2px">Domingo 23 de agosto</p>
+        <p class="naranja tabular" style="font-size:46px;font-weight:700;text-align:center;margin:22px 0 14px" data-anim="hoy">$ 0</p>
+        <div class="barra" style="height:9px"><span data-anim="barraHoy" style="width:0;background:linear-gradient(90deg,var(--brand),var(--brand-light))"></span></div>
+        <p style="font-size:12px;color:var(--muted);text-align:center;margin-top:10px">de $ 1.450.000 este mes</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 5. El mes -->
+  <section class="escena" data-escena="mes">
+    <p class="etiqueta" data-anim="etiqueta">Tu mes</p>
+    <h2 class="titulo chico" style="margin-top:12px" data-anim="titulo">En qué se te fue, categoría por categoría</h2>
+    <div class="tarjeta" style="margin-top:32px;width:620px" data-anim="tarjeta">
+      <div id="categorias" style="display:flex;flex-direction:column;gap:19px"></div>
+    </div>
+  </section>
+
+  <!-- 6. El año -->
+  <section class="escena" data-escena="anio">
+    <p class="etiqueta" data-anim="etiqueta">Tu año</p>
+    <h2 class="titulo chico" style="margin-top:12px" data-anim="titulo">Y la foto completa de los doce meses</h2>
+    <div class="tarjeta" style="margin-top:34px;width:660px" data-anim="tarjeta">
+      <div id="meses" style="display:flex;align-items:flex-end;gap:11px;height:190px"></div>
+      <div id="mesesEtiquetas" style="display:flex;gap:11px;margin-top:12px"></div>
+    </div>
+  </section>
+
+  <!-- 7. Fijos y cuotas -->
+  <section class="escena" data-escena="fijos">
+    <p class="etiqueta" data-anim="etiqueta">Lo que se repite</p>
+    <h2 class="titulo chico" style="margin-top:12px;max-width:900px" data-anim="titulo">El alquiler y las cuotas se cargan <span class="naranja">una sola vez</span></h2>
+    <p class="bajada" data-anim="bajada">Después aparecen solos en cada mes, sin que tengas que acordarte.</p>
+    <div style="display:flex;gap:16px;margin-top:34px" id="fijos"></div>
+  </section>
+
+  <!-- 8. Cierre -->
+  <section class="escena" data-escena="cierre">
+    <div class="marca" data-anim="marca">
+      <span class="logo">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M19 7V4a1 1 0 0 0-1-1H5a2 2 0 0 0 0 4h15a1 1 0 0 1 1 1v4h-3a2 2 0 0 0 0 4h3a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1"/>
+          <path d="M3 5v14a2 2 0 0 0 2 2h15a1 1 0 0 0 1-1v-4"/>
+        </svg>
+      </span>
+      <span style="font-size:46px;font-weight:700;letter-spacing:-.02em">Mis Finanzas</span>
+    </div>
+    <p class="bajada" style="font-size:26px;margin-top:24px" data-anim="bajada">Gratis, sin tarjeta, y tus datos son tuyos.</p>
+    <span class="cta" style="margin-top:36px" data-anim="cta">Empezá a llevar tus finanzas</span>
+  </section>
+</div>
+
+<script type="module" src="storyboard.js"></script>
+</body>
+</html>
