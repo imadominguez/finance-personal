@@ -98,7 +98,7 @@ function DialogContent({
           El que scrollea es el contenido, no el diálogo: así el botón de cerrar
           queda siempre a la vista en la esquina.
         */}
-        <div className="flex flex-col gap-4 overflow-y-auto overscroll-contain p-4 pb-[max(1rem,env(safe-area-inset-bottom))] sm:pb-4">
+        <div className="flex flex-col gap-4 overflow-y-auto overscroll-contain p-4 pb-[max(1rem,var(--safe-bottom))] sm:pb-4">
           {children}
         </div>
       </DialogPrimitive.Popup>

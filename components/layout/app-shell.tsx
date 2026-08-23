@@ -44,8 +44,8 @@ export function AppShell({
 
   return (
     <div className="flex min-h-dvh flex-col">
-      <header className="sticky top-0 z-40 border-b border-hairline bg-background/85 backdrop-blur-xl">
-        <div className="mx-auto w-full max-w-3xl px-4">
+      <header className="sticky top-0 z-40 border-b border-hairline bg-background/85 pt-(--safe-top) backdrop-blur-xl">
+        <div className="mx-auto w-full max-w-3xl pr-[max(1rem,var(--safe-right))] pl-[max(1rem,var(--safe-left))]">
           <div className="flex h-14 items-center justify-between gap-3">
             <Link
               href="/hoy"
@@ -77,11 +77,11 @@ export function AppShell({
         </div>
       </header>
 
-      <main className="mx-auto w-full max-w-3xl flex-1 px-4 pt-5 pb-24 sm:pb-10">
+      <main className="mx-auto w-full max-w-3xl flex-1 pt-5 pr-[max(1rem,var(--safe-right))] pb-[calc(6rem+var(--safe-bottom))] pl-[max(1rem,var(--safe-left))] sm:pb-[calc(2.5rem+var(--safe-bottom))]">
         {children}
       </main>
 
-      <footer className="mx-auto w-full max-w-3xl px-4 pr-24 pb-6 text-center text-xs text-muted-foreground sm:pr-4">
+      <footer className="mx-auto w-full max-w-3xl pr-24 pb-[calc(1.5rem+var(--safe-bottom))] pl-[max(1rem,var(--safe-left))] text-center text-xs text-muted-foreground sm:pr-[max(1rem,var(--safe-right))]">
         Tus datos están guardados en tu cuenta. Podés exportarlos desde{" "}
         <Link
           href="/ajustes"
@@ -97,7 +97,7 @@ export function AppShell({
         size="icon-lg"
         aria-label="Nuevo movimiento"
         onClick={() => setCreating(true)}
-        className="fixed right-5 bottom-5 z-40 size-14 rounded-full shadow-[0_10px_30px_-8px_rgba(232,93,36,0.9)] transition-transform duration-200 hover:scale-105 active:scale-95 motion-reduce:hover:scale-100 sm:hidden [&_svg:not([class*='size-'])]:size-6"
+        className="fixed right-[calc(1.25rem+var(--safe-right))] bottom-[calc(1.25rem+var(--safe-bottom))] z-40 size-14 rounded-full shadow-[0_10px_30px_-8px_rgba(232,93,36,0.9)] transition-transform duration-200 hover:scale-105 active:scale-95 motion-reduce:hover:scale-100 sm:hidden [&_svg:not([class*='size-'])]:size-6"
       >
         <Plus />
       </Button>

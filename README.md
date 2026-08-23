@@ -42,6 +42,18 @@ La app se instala en el teléfono o el escritorio y se abre a pantalla completa.
   botón abre las instrucciones concretas de esa plataforma en vez de no hacer nada.
 - **Invitación discreta** en la landing, descartable, que no vuelve a molestar.
 
+### Zonas seguras del dispositivo
+
+Con `viewport-fit=cover` el contenido va de borde a borde, que es lo que hace que la app
+instalada se vea como una app nativa. El costo es que hay que respetar a mano las zonas
+que ocupa el sistema: la barra de estado arriba, la de gestos abajo, el notch a los
+costados. Sin eso, la barra de estado del teléfono queda **encima** del encabezado.
+
+Los insets se exponen como variables CSS en `globals.css` (`--safe-top`, `--safe-bottom`,
+`--safe-left`, `--safe-right`) en vez de usar `env()` suelto en cada lugar. El motivo es
+poder probarlo: `env()` no se puede sobreescribir desde una prueba, una variable sí, así
+que se simula un teléfono con barra de estado y se verifica que nada quede tapado.
+
 ### Diálogos en pantallas chicas
 
 En mobile los diálogos son una hoja inferior: los formularios de esta app pasan los 700px
