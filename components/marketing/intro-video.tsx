@@ -66,7 +66,7 @@ export function IntroVideo({ className }: { className?: string }) {
   return (
     <div className={cn("flex flex-col gap-6 lg:flex-row lg:gap-8", className)}>
       <figure className="min-w-0 flex-1">
-        <div className="surface-card relative animate-fade-up overflow-hidden rounded-2xl">
+        <div className="surface-card revelar relative overflow-hidden rounded-2xl">
           <video
             ref={videoRef}
             className="aspect-video w-full bg-surface"
@@ -105,16 +105,15 @@ export function IntroVideo({ className }: { className?: string }) {
       </figure>
 
       {/* Índice: alternativa textual y atajo para saltar a un tramo */}
-      <ol className="flex shrink-0 flex-col gap-1 lg:w-72">
-        {CAPITULOS.map((capitulo, index) => {
+      <ol className="revelar-hijos flex shrink-0 flex-col gap-1 lg:w-72">
+        {CAPITULOS.map((capitulo) => {
           const [minutos, segundos] = capitulo.t.split(":").map(Number);
           return (
             <li key={capitulo.t}>
               <button
                 type="button"
                 onClick={() => reproducir(minutos * 60 + segundos)}
-                className="group flex w-full animate-fade-up cursor-pointer items-start gap-3 rounded-lg px-3 py-2 text-left transition-colors duration-200 hover:bg-surface-raised"
-                style={{ animationDelay: `${index * 50}ms` }}
+                className="group flex w-full cursor-pointer items-start gap-3 rounded-lg px-3 py-2 text-left transition-colors duration-200 hover:bg-surface-raised"
               >
                 <span className="mt-0.5 shrink-0 text-xs tabular text-muted-foreground transition-colors group-hover:text-brand">
                   {capitulo.t}

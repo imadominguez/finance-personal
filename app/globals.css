@@ -360,3 +360,149 @@
     scroll-behavior: auto !important;
   }
 }
+
+/* -------------------------------------------------------------------------- */
+/* Animaciones ligadas al scroll (parallax de la landing)                     */
+/* -------------------------------------------------------------------------- */
+
+/*
+ * Se usan `animation-timeline: view()`, que corren en el compositor: el
+ * progreso lo maneja el navegador según la posición del elemento en pantalla,
+ * sin escuchar el evento `scroll` ni recalcular en cada cuadro. Eso es lo que
+ * separa un parallax fluido de uno que traba.
+ *
+ * Dos garantías, en este orden:
+ *  1. El estado por defecto es VISIBLE. Todo esto vive dentro de un @supports,
+ *     así que un navegador sin soporte muestra la página quieta y completa,
+ *     nunca secciones en blanco.
+ *  2. Con `prefers-reduced-motion` no se aplica nada: quien pidió menos
+ *     movimiento no debería recibir justo lo contrario al hacer scroll.
+ */
+
+@keyframes revelar {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes revelar-suave {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Capa decorativa que se mueve a otra velocidad que el contenido: el parallax. */
+@keyframes deriva-lenta {
+  from {
+    transform: translate3d(-50%, -14%, 0);
+  }
+  to {
+    transform: translate3d(-50%, 14%, 0);
+  }
+}
+
+@keyframes deriva-contraria {
+  from {
+    transform: translate3d(-50%, 12%, 0);
+  }
+  to {
+    transform: translate3d(-50%, -12%, 0);
+  }
+}
+
+/* Barra de avance de lectura, atada al scroll de la página. */
+@keyframes avance-lectura {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
+/* Línea que se dibuja al bajar, para los pasos de "cómo funciona". */
+@keyframes trazar-linea {
+  from {
+    transform: scaleY(0);
+  }
+  to {
+    transform: scaleY(1);
+  }
+}
+
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    /* Aparición al entrar en pantalla. Reemplaza a las animaciones que
+       disparaban al cargar y ya habían terminado antes de que llegaras. */
+    .revelar {
+      animation: revelar linear both;
+      animation-timeline: view();
+      animation-range: entry 12% cover 30%;
+    }
+
+    /*
+     * Escalonado gratis: cada hijo tiene su propia línea de tiempo según su
+     * posición, así que las tarjetas de una grilla aparecen una tras otra a
+     * medida que suben, sin delays fijos que se desincronizan.
+     */
+    .revelar-hijos > * {
+      animation: revelar-suave linear both;
+      animation-timeline: view();
+      animation-range: entry 8% cover 26%;
+    }
+
+    .parallax-lento {
+      animation: deriva-lenta linear both;
+      animation-timeline: view();
+      animation-range: cover;
+    }
+
+    .parallax-contrario {
+      animation: deriva-contraria linear both;
+      animation-timeline: view();
+      animation-range: cover;
+    }
+
+    .trazo-vertical {
+      transform-origin: top;
+      animation: trazar-linea linear both;
+      animation-timeline: view();
+      animation-range: entry 30% cover 65%;
+    }
+
+    /* Atada al scroll del documento, no a la posición de un elemento. */
+    .avance-lectura {
+      transform-origin: left;
+      animation: avance-lectura linear both;
+      animation-timeline: scroll(root block);
+    }
+  }
+}
+
+/*
+ * Impresión: las apariciones ligadas al scroll dejan elementos en opacidad 0
+ * hasta que entran en pantalla, y al imprimir no hay scroll. Sin esto, media
+ * landing saldría en blanco.
+ */
+@media print {
+  .revelar,
+  .revelar-hijos > *,
+  .parallax-lento,
+  .parallax-contrario,
+  .trazo-vertical,
+  .avance-lectura {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}
