@@ -206,6 +206,20 @@
  */
 :root,
 .dark {
+  /*
+   * Zonas seguras del dispositivo.
+   *
+   * Con `viewport-fit=cover` el contenido va de borde a borde: sin este
+   * margen, la barra de estado del teléfono queda encima del encabezado.
+   * Se exponen como variables (y no usando env() suelto en cada lugar) para
+   * poder simularlas en las pruebas: env() no se puede sobreescribir, una
+   * variable sí.
+   */
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-left: env(safe-area-inset-left, 0px);
+  --safe-right: env(safe-area-inset-right, 0px);
+
   --background: #0a0a0a;
   --foreground: #ffffff;
 

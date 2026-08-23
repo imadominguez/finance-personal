@@ -6,7 +6,7 @@ import { APP_NAME } from "@/lib/constants";
 /** Marco de las pantallas públicas: una tarjeta centrada, sin navegación. */
 export default function AuthLayout({ children }: LayoutProps<"/">) {
   return (
-    <div className="flex min-h-dvh flex-col items-center justify-center px-4 py-10">
+    <div className="flex min-h-dvh flex-col items-center justify-center px-4 pt-[calc(2.5rem+var(--safe-top))] pb-[calc(2.5rem+var(--safe-bottom))]">
       <Link
         href="/"
         className="group mb-6 flex animate-fade-down items-center gap-2.5 transition-opacity hover:opacity-80"
