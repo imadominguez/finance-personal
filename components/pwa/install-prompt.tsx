@@ -62,7 +62,7 @@ export function InstallPrompt({ className }: { className?: string }) {
         className,
       )}
     >
-      <span className="brand-gradient flex size-9 shrink-0 items-center justify-center rounded-lg text-[#0a0a0a]">
+      <span className="brand-gradient flex size-9 shrink-0 items-center justify-center rounded-lg text-primary-foreground">
         <Download className="size-4" />
       </span>
 

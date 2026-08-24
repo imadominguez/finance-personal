@@ -4,15 +4,15 @@ import { CreditCard, Home, ShoppingCart, Utensils, Zap } from "lucide-react";
  * Maqueta del resumen mensual para el hero.
  *
  * Está escrita a mano con los mismos tokens del sistema en vez de ser una
- * captura: queda nítida en cualquier pantalla, pesa nada y no se desactualiza
- * cuando cambia la paleta.
+ * captura: queda nítida en cualquier pantalla, pesa nada y sigue al tema
+ * —modo y color— que tenga elegido quien la mira.
  */
 
 const CATEGORIES = [
   {
     name: "Alquiler",
     icon: Home,
-    color: "#e85d24",
+    color: "var(--chart-1)",
     amount: "$ 480.000",
     share: 36,
     width: 100,
@@ -20,7 +20,7 @@ const CATEGORIES = [
   {
     name: "Cuotas tarjeta",
     icon: CreditCard,
-    color: "#c45628",
+    color: "var(--chart-4)",
     amount: "$ 250.000",
     share: 19,
     width: 52,
@@ -28,7 +28,7 @@ const CATEGORIES = [
   {
     name: "Supermercado",
     icon: ShoppingCart,
-    color: "#ff8c42",
+    color: "var(--chart-2)",
     amount: "$ 193.400",
     share: 15,
     width: 40,
@@ -36,7 +36,7 @@ const CATEGORIES = [
   {
     name: "Servicios",
     icon: Zap,
-    color: "#f0a070",
+    color: "var(--chart-5)",
     amount: "$ 138.000",
     share: 10,
     width: 29,
@@ -44,7 +44,7 @@ const CATEGORIES = [
   {
     name: "Delivery y salidas",
     icon: Utensils,
-    color: "#d97634",
+    color: "var(--chart-3)",
     amount: "$ 78.800",
     share: 6,
     width: 16,
@@ -55,7 +55,7 @@ export function HeroPreview() {
   return (
     <div
       aria-hidden="true"
-      className="surface-card relative w-full max-w-sm animate-fade-up rounded-2xl p-5 shadow-[0_30px_60px_-20px_rgba(0,0,0,0.9)]"
+      className="surface-card relative w-full max-w-sm animate-fade-up rounded-2xl p-5 shadow-(--sombra-card)"
       style={{ animationDelay: "220ms" }}
     >
       <div className="pointer-events-none absolute -top-20 left-1/2 size-56 -translate-x-1/2 animate-glow rounded-full bg-brand/25 blur-3xl" />

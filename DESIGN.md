@@ -250,6 +250,60 @@ FOOTER (Opcional):
 
 ---
 
+## 🎛️ Temas (agregado después de la guía original)
+
+La paleta de arriba sigue siendo la de fábrica: **modo oscuro, acento naranja**. Lo que
+cambió es que ya no es la única. Cada persona elige, desde Ajustes, tres cosas:
+
+| Qué | Opciones | Variable que se pisa |
+|---|---|---|
+| Modo | Claro · Oscuro · El del sistema | la clase `dark` en `<html>` |
+| Color | 8 presets + uno a gusto | `--brand` |
+| Bordes | Recto · Suave · Normal · Redondo | `--radius` |
+
+### La regla: una variable manda
+
+Solo se pisan **tres** propiedades en línea sobre `<html>`: `--brand`,
+`--primary-foreground` y `--radius`. Todo el resto se deriva en `app/globals.css`:
+
+```css
+--primary: var(--brand);
+--ring: var(--brand);
+--sidebar-primary: var(--brand);
+--brand-light: color-mix(in oklab, var(--brand), black 8%);   /* claro */
+--chart-2:     color-mix(in oklab, var(--brand), black 12%);  /* claro */
+```
+
+Al agregar un componente: usar los tokens (`bg-brand`, `text-brand`,
+`text-primary-foreground`, `border-hairline`, `shadow-(--sombra-card)`). **Nunca** un hex
+suelto ni un `rgba()` con el naranja adentro: se rompe apenas alguien cambie de color.
+
+### Las mezclas van siempre hacia más contraste
+
+En claro `--brand-light` y los `--chart-*` se mezclan con **negro**; en oscuro, con
+**blanco**. Suena raro que "light" sea más oscuro, y es a propósito: el degradado y la
+rampa tienen texto encima o son texto, así que cada paso tiene que contrastar más contra
+el fondo del modo, no menos.
+
+### Contraste garantizado, incluso con un color inventado
+
+`text-brand` aparece en etiquetas de 12px, así que el mínimo es **4.5:1** (AA texto
+normal), no 3:1. Los ocho presets están medidos contra el fondo y contra las tarjetas de
+cada modo. Un color elegido a mano pasa por `ajustarContraste` (`lib/theme.ts`), que lo
+acerca al blanco o al negro con una búsqueda binaria hasta que cumple. Por eso un amarillo
+puro termina siendo oliva en modo claro: se conserva todo el tono que se pueda, pero la
+legibilidad no se negocia.
+
+### Sin parpadeo
+
+El servidor renderiza el tema de fábrica —no sabe qué eligió quien pide la página—. Un
+script en línea en el `<head>` (`components/theme/theme-script.tsx`) lee `localStorage` y
+corrige `<html>` mientras el navegador parsea el HTML, antes de pintar. Un `useEffect`
+llegaría tarde. Las variables van precalculadas en `localStorage`, así ese script no hace
+cuentas de contraste.
+
+---
+
 ## 🎨 Estilos Específicos
 
 ### Dark Mode (Default)

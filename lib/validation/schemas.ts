@@ -1,5 +1,7 @@
 import { z } from "zod";
 
+import { ACENTO_PERSONALIZADO, ACENTOS, MODOS, RADIOS } from "@/lib/theme";
+
 /**
  * Validación de todo lo que entra desde el cliente. Las Server Actions son
  * endpoints públicos: nada que llegue de afuera se escribe sin pasar por acá.
@@ -86,10 +88,35 @@ export const settingsSchema = z.object({
   displayName: z.string().trim().max(60),
 });
 
-
+/**
+ * Apariencia. Se validan las opciones contra las listas reales en vez de
+ * aceptar cualquier texto: lo que se guarde acá termina, sin más filtros, en
+ * una variable CSS de todas las pantallas de esa persona.
+ */
+export const themeSchema = z.object({
+  modo: z.enum(MODOS),
+  acento: z
+    .string()
+    .refine(
+      (valor) =>
+        valor === ACENTO_PERSONALIZADO ||
+        ACENTOS.some((acento) => acento.id === valor),
+      "Ese acento no existe",
+    ),
+  color: z
+    .string()
+    .regex(/^#([0-9a-f]{3}|[0-9a-f]{6})$/i, "El color tiene que ser un hex"),
+  radio: z
+    .string()
+    .refine(
+      (valor) => RADIOS.some((radio) => radio.id === valor),
+      "Ese radio no existe",
+    ),
+});
 
 export type TransactionInput = z.infer<typeof transactionSchema>;
 export type CategoryInput = z.infer<typeof categorySchema>;
 export type RecurringInput = z.infer<typeof recurringSchema>;
 export type InstallmentInput = z.infer<typeof installmentSchema>;
 export type SettingsInput = z.infer<typeof settingsSchema>;
+export type ThemeInput = z.infer<typeof themeSchema>;
