@@ -11,17 +11,17 @@ expresados en dólares, al tipo de cambio que elija.
 
 ## Qué hace
 
-| Pantalla | Qué muestra |
-|---|---|
-| `/hoy` **Hoy** | Cuánto llevás gastado hoy, contra tu promedio diario y contra el día anterior. Cuánto podés gastar por día con lo que queda del mes. |
-| `/mes` **Mes** | "¿A dónde se fue tu sueldo?": total del mes, avance contra tu presupuesto, dona por categoría, gasto día por día, ranking de categorías y proyección de cierre. |
-| `/anio` **Año** | Tendencia mes a mes, mes más caro y más barato, promedio mensual y en qué se fue el año. |
-| `/movimientos` | Historial completo con filtros por texto, tipo, categoría y rango de fechas. |
-| `/fijos` | Gastos e ingresos fijos (alquiler, servicios, sueldo) y compras en cuotas. |
-| `/categorias` | ABM de categorías con color e ícono, y el acumulado del año de cada una. |
-| `/ajustes` | Presupuesto mensual, moneda, exportar/importar JSON, cuenta y borrado. |
-| `/` | Landing institucional pública: qué hace la app, cómo funciona y preguntas. |
-| `/ingresar` | Acceso con Google. `/crear-cuenta` redirige acá: no hay alta separada. |
+| Pantalla        | Qué muestra                                                                                                                                                     |
+| --------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `/hoy` **Hoy**  | Cuánto llevás gastado hoy, contra tu promedio diario y contra el día anterior. Cuánto podés gastar por día con lo que queda del mes.                            |
+| `/mes` **Mes**  | "¿A dónde se fue tu sueldo?": total del mes, avance contra tu presupuesto, dona por categoría, gasto día por día, ranking de categorías y proyección de cierre. |
+| `/anio` **Año** | Tendencia mes a mes, mes más caro y más barato, promedio mensual y en qué se fue el año.                                                                        |
+| `/movimientos`  | Historial completo con filtros por texto, tipo, categoría y rango de fechas.                                                                                    |
+| `/fijos`        | Gastos e ingresos fijos (alquiler, servicios, sueldo) y compras en cuotas.                                                                                      |
+| `/categorias`   | ABM de categorías con color e ícono, y el acumulado del año de cada una.                                                                                        |
+| `/ajustes`      | Presupuesto mensual, moneda, exportar/importar JSON, cuenta y borrado.                                                                                          |
+| `/`             | Landing institucional pública: qué hace la app, cómo funciona y preguntas.                                                                                      |
+| `/ingresar`     | Acceso con Google. `/crear-cuenta` redirige acá: no hay alta separada.                                                                                          |
 
 Atajo: la tecla **`n`** abre el alta de movimiento desde cualquier pantalla.
 
@@ -71,7 +71,7 @@ no se baja un mega de video sin pedirlo. Los detalles y cómo regenerarlo están
 La app se instala en el teléfono o el escritorio y se abre a pantalla completa.
 
 - **Manifiesto** en `app/manifest.ts` (ruta de metadatos de Next), con íconos comunes y
-  *maskable*, y accesos directos a Hoy, Mes y Movimientos. `start_url` es `/hoy`: quien la
+  _maskable_, y accesos directos a Hoy, Mes y Movimientos. `start_url` es `/hoy`: quien la
   instaló ya sabe qué es, quiere ver sus números.
 - **Service worker** en `public/sw.js`, registrado después del `load` y solo en producción.
 - **Sin conexión** muestra `/sin-conexion`, que se recarga sola cuando vuelve la red.
@@ -154,7 +154,7 @@ Un email sin verificar se rechaza con un mensaje explicando por qué.
 ### Configurar Google
 
 En Google Cloud Console → APIs y servicios → Credenciales → ID de cliente OAuth, tipo
-*Aplicación web*. En **URI de redireccionamiento autorizados** hay que dar de alta una por
+_Aplicación web_. En **URI de redireccionamiento autorizados** hay que dar de alta una por
 cada origen, tal cual:
 
 ```
@@ -195,6 +195,12 @@ listas y punteadas en los gráficos, para no confundir lo que ya pasó con lo qu
 
 ## Cómo correrlo
 
+> **El gestor de paquetes es pnpm.** Vercel instala con `pnpm install
+--frozen-lockfile`, así que **una dependencia agregada con `npm install` rompe
+> el deploy**: actualiza `package-lock.json` y deja `pnpm-lock.yaml` sin ese
+> paquete. Si por lo que sea usás npm, corré después `pnpm install
+--lockfile-only` y commiteá los dos lockfiles.
+
 Necesitás una base PostgreSQL. Podés levantar una local o usar la de Vercel (ver más abajo).
 
 ```bash
@@ -218,11 +224,11 @@ pnpm db:studio    # explorar la base en el navegador
 
 Entrá en `/ingresar` con tu cuenta de Google. La primera vez se crea sola, con las
 categorías base; podés cargar tu primer gasto o tocar **"Cargar datos de ejemplo"** para ver
-12 meses de datos verosímiles y borrarlos después desde *Ajustes*.
+12 meses de datos verosímiles y borrarlos después desde _Ajustes_.
 
 ### Si venías de la versión con localStorage
 
-Al entrar a *Ajustes* desde el mismo navegador que usabas antes, la app detecta los datos
+Al entrar a _Ajustes_ desde el mismo navegador que usabas antes, la app detecta los datos
 viejos y ofrece subirlos a tu cuenta con un botón. También podés importar a mano el JSON
 que hayas exportado.
 
@@ -231,7 +237,7 @@ que hayas exportado.
 1. **Creá la base**: en el panel de tu proyecto, **Storage → Create Database → Postgres**.
    Vercel la provisiona con Neon y agrega solas `DATABASE_URL` (pooled) y
    `DATABASE_URL_UNPOOLED` (directa) al proyecto.
-2. **Agregá `SESSION_SECRET`** en *Settings → Environment Variables*, con el valor de
+2. **Agregá `SESSION_SECRET`** en _Settings → Environment Variables_, con el valor de
    `openssl rand -base64 32`. Usá uno distinto al de desarrollo.
 3. **Deploy**. El `build` corre `prisma generate && prisma migrate deploy && next build`,
    así que las tablas se crean solas en el primer despliegue y las migraciones nuevas se
