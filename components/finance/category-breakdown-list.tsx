@@ -7,11 +7,12 @@ import { Money } from "@/components/finance/money";
 import { ProgressBar } from "@/components/finance/progress-bar";
 import { formatPercent } from "@/lib/format";
 import { cn } from "@/lib/utils";
-import type { CategoryBreakdown, Settings } from "@/lib/types";
+import type { CategoryBreakdown, MoneyFormat } from "@/lib/types";
 
 interface CategoryBreakdownListProps {
   items: CategoryBreakdown[];
-  settings: Settings;
+  /** Cómo dibujar los montos. Sale de `moneyFormat`, no de `state.settings`. */
+  settings: MoneyFormat;
   /** Cuántas filas mostrar antes del botón "ver todas". */
   limit?: number;
   emptyMessage?: string;
@@ -101,7 +102,7 @@ export function CategoryBreakdownList({
         <button
           type="button"
           onClick={() => setExpanded(true)}
-          className="mt-3 self-center rounded-lg px-3 py-1.5 text-xs font-medium text-muted-foreground transition-colors hover:bg-surface-raised hover:text-brand"
+          className="mt-3 flex min-h-11 items-center self-center rounded-lg px-3 py-1.5 text-xs font-medium text-muted-foreground transition-colors hover:bg-surface-raised hover:text-brand sm:min-h-0"
         >
           Ver {hidden} categoría{hidden === 1 ? "" : "s"} más
         </button>

@@ -42,7 +42,7 @@ import { formatMoney } from "@/lib/format";
  * y qué movimientos hubo. Es la pantalla de consulta rápida.
  */
 export function HoyView() {
-  const { state, loadSampleData } = useFinanceReady();
+  const { state, loadSampleData, moneyFormat } = useFinanceReady();
   const [date, setDate] = React.useState(todayKey());
 
   const period: Period = { kind: "dia", date };
@@ -75,7 +75,7 @@ export function HoyView() {
         title={isToday ? "¿Cuánto llevás gastado hoy?" : "Gastos del día"}
         subtitle={formatDayLong(date)}
         amount={summary.gastos}
-        settings={state.settings}
+        settings={moneyFormat}
         comparison={comparison}
         comparisonLabel="vs. el día anterior"
         actions={
@@ -98,18 +98,18 @@ export function HoyView() {
                 hint: budget.overBudget ? (
                   <>
                     Ya pasaste tu tope mensual de{" "}
-                    {formatMoney(budget.budget, state.settings)} por{" "}
+                    {formatMoney(budget.budget, moneyFormat)} por{" "}
                     <span className="font-medium text-destructive">
-                      {formatMoney(Math.abs(budget.remaining), state.settings)}
+                      {formatMoney(Math.abs(budget.remaining), moneyFormat)}
                     </span>
                   </>
                 ) : (
                   <>
                     Llevás{" "}
                     <span className="font-medium text-foreground/80">
-                      {formatMoney(monthSummary.gastos, state.settings)}
+                      {formatMoney(monthSummary.gastos, moneyFormat)}
                     </span>{" "}
-                    de {formatMoney(budget.budget, state.settings)} este mes
+                    de {formatMoney(budget.budget, moneyFormat)} este mes
                   </>
                 ),
               }
@@ -132,7 +132,7 @@ export function HoyView() {
           value={
             summary.entries.filter((entry) => entry.kind === "gasto").length
           }
-          settings={state.settings}
+          settings={moneyFormat}
           format="count"
           icon={Receipt}
           delay={60}
@@ -143,7 +143,7 @@ export function HoyView() {
         <StatCard
           label="Promedio diario"
           value={dailyAverage}
-          settings={state.settings}
+          settings={moneyFormat}
           icon={TrendingDown}
           delay={120}
           hint={
@@ -157,7 +157,7 @@ export function HoyView() {
         <StatCard
           label={budget.hasBudget ? "Podés gastar por día" : "Ingresos del día"}
           value={budget.hasBudget ? budget.dailyAllowance : summary.ingresos}
-          settings={state.settings}
+          settings={moneyFormat}
           icon={Wallet}
           tone={budget.hasBudget ? "default" : "ingreso"}
           delay={180}
@@ -181,7 +181,7 @@ export function HoyView() {
       >
         <CategoryBreakdownList
           items={summary.byCategory}
-          settings={state.settings}
+          settings={moneyFormat}
           emptyMessage="No registraste gastos en este día."
         />
       </SectionCard>
@@ -192,7 +192,7 @@ export function HoyView() {
         action={
           <Link
             href="/movimientos"
-            className="text-xs text-muted-foreground transition-colors hover:text-brand"
+            className="flex min-h-11 items-center rounded-lg px-2 text-xs text-muted-foreground transition-colors hover:bg-surface-raised hover:text-brand sm:min-h-6 sm:px-1 sm:hover:bg-transparent"
           >
             Ver todos
           </Link>
@@ -213,7 +213,7 @@ export function HoyView() {
             </p>
             <Money
               value={monthSummary.gastos}
-              settings={state.settings}
+              settings={moneyFormat}
               className="text-xl font-bold text-brand"
             />
           </div>
@@ -234,12 +234,7 @@ function FirstRun({ onLoadSample }: { onLoadSample: () => void }) {
         title="Empezá a llevar tus finanzas"
         subtitle="Todavía no hay nada cargado"
         amount={0}
-        settings={{
-          monthlyBudget: 0,
-          currency: "ARS",
-          locale: "es-AR",
-          displayName: "",
-        }}
+        settings={{ currency: "ARS", locale: "es-AR", usdRate: null }}
       />
 
       <EmptyState

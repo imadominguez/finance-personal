@@ -41,7 +41,7 @@ import { formatMoney } from "@/lib/format";
 
 /** Vista mensual: el corazón de la app. */
 export function MesView() {
-  const { state, loadSampleData } = useFinanceReady();
+  const { state, loadSampleData, moneyFormat } = useFinanceReady();
   const [month, setMonth] = React.useState(currentMonthKey());
   const [activeCategory, setActiveCategory] = React.useState<string | null>(
     null,
@@ -67,7 +67,7 @@ export function MesView() {
 
   const donutSlices = summary.byCategory.slice(0, 8).map((item) => ({
     id: item.category.id,
-    label: `${item.category.name}: ${formatMoney(item.total, state.settings)}`,
+    label: `${item.category.name}: ${formatMoney(item.total, moneyFormat)}`,
     value: item.total,
     color: item.category.color,
   }));
@@ -83,7 +83,7 @@ export function MesView() {
         title="¿A dónde se fue tu sueldo?"
         subtitle={formatMonthLong(month)}
         amount={summary.gastos}
-        settings={state.settings}
+        settings={moneyFormat}
         comparison={comparison}
         comparisonLabel="vs. mes anterior"
         progress={
@@ -97,15 +97,15 @@ export function MesView() {
                   <>
                     Te pasaste{" "}
                     <span className="font-medium text-destructive">
-                      {formatMoney(Math.abs(budget.remaining), state.settings)}
+                      {formatMoney(Math.abs(budget.remaining), moneyFormat)}
                     </span>{" "}
-                    de {formatMoney(budget.budget, state.settings)}
+                    de {formatMoney(budget.budget, moneyFormat)}
                   </>
                 ) : (
                   <>
-                    De {formatMoney(budget.budget, state.settings)} te quedan{" "}
+                    De {formatMoney(budget.budget, moneyFormat)} te quedan{" "}
                     <span className="font-medium text-foreground/80">
-                      {formatMoney(budget.remaining, state.settings)}
+                      {formatMoney(budget.remaining, moneyFormat)}
                     </span>
                   </>
                 ),
@@ -149,20 +149,20 @@ export function MesView() {
             <StatCard
               label="Gastos"
               value={summary.gastos}
-              settings={state.settings}
+              settings={moneyFormat}
               icon={ArrowDownRight}
               tone="gasto"
               delay={60}
               hint={
                 summary.gastosProyectados > 0
-                  ? `${formatMoney(summary.gastosProyectados, state.settings)} por venir`
+                  ? `${formatMoney(summary.gastosProyectados, moneyFormat)} por venir`
                   : "Todo ya ocurrido"
               }
             />
             <StatCard
               label="Ingresos"
               value={summary.ingresos}
-              settings={state.settings}
+              settings={moneyFormat}
               icon={ArrowUpRight}
               tone="ingreso"
               delay={110}
@@ -171,7 +171,7 @@ export function MesView() {
             <StatCard
               label="Balance"
               value={summary.balance}
-              settings={state.settings}
+              settings={moneyFormat}
               icon={Scale}
               tone="balance"
               signed
@@ -181,12 +181,12 @@ export function MesView() {
             <StatCard
               label="Promedio diario"
               value={dailyAverage}
-              settings={state.settings}
+              settings={moneyFormat}
               icon={PiggyBank}
               delay={210}
               hint={
                 isCurrentMonth
-                  ? `Cierre estimado: ${formatMoney(projection, state.settings)}`
+                  ? `Cierre estimado: ${formatMoney(projection, moneyFormat)}`
                   : "Sobre los días del mes"
               }
             />
@@ -209,7 +209,7 @@ export function MesView() {
                 </span>
                 <Money
                   value={active ? active.total : summary.gastos}
-                  settings={state.settings}
+                  settings={moneyFormat}
                   compact
                   className="text-xl font-bold text-brand"
                 />
@@ -235,7 +235,7 @@ export function MesView() {
                         onMouseLeave={() => setActiveCategory(null)}
                         onFocus={() => setActiveCategory(slice.id)}
                         onBlur={() => setActiveCategory(null)}
-                        className="flex w-full animate-slide-in-right items-center gap-2 rounded-lg px-2 py-1.5 text-left transition-colors hover:bg-surface-raised"
+                        className="flex min-h-11 w-full animate-slide-in-right items-center gap-2 rounded-lg px-2 py-1.5 text-left transition-colors hover:bg-surface-raised sm:min-h-0"
                         style={{ animationDelay: `${index * 55}ms` }}
                       >
                         <span
@@ -263,7 +263,7 @@ export function MesView() {
           >
             <BarChart
               data={dayBars}
-              formatValue={(value) => formatMoney(value, state.settings)}
+              formatValue={(value) => formatMoney(value, moneyFormat)}
               height={140}
               showLabels={false}
             />
@@ -281,7 +281,7 @@ export function MesView() {
           >
             <CategoryBreakdownList
               items={summary.byCategory}
-              settings={state.settings}
+              settings={moneyFormat}
               limit={6}
             />
           </SectionCard>
@@ -290,7 +290,7 @@ export function MesView() {
             <SectionCard title="De dónde vino la plata" delay={240}>
               <CategoryBreakdownList
                 items={summary.ingresosByCategory}
-                settings={state.settings}
+                settings={moneyFormat}
                 emptyMessage="No registraste ingresos este mes."
               />
             </SectionCard>
@@ -302,7 +302,7 @@ export function MesView() {
             action={
               <Link
                 href="/movimientos"
-                className="text-xs text-muted-foreground transition-colors hover:text-brand"
+                className="flex min-h-11 items-center rounded-lg px-2 text-xs text-muted-foreground transition-colors hover:bg-surface-raised hover:text-brand sm:min-h-6 sm:px-1 sm:hover:bg-transparent"
               >
                 Ver todos
               </Link>

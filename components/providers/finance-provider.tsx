@@ -27,7 +27,9 @@ import {
 } from "@/app/actions/data";
 import type {
   Category,
+  Cotizacion,
   FinanceState,
+  MoneyFormat,
   InstallmentPlan,
   RecurringRule,
   Settings,
@@ -66,6 +68,16 @@ interface FinanceActions {
 
 interface FinanceContextValue extends FinanceActions {
   state: FinanceState;
+  /**
+   * Con qué reglas se dibujan los montos. Es lo que hay que pasarle a `Money`
+   * y a `formatMoney`, no `state.settings`: si la persona eligió ver en
+   * dólares, acá ya viene la cotización con la que dividir.
+   */
+  moneyFormat: MoneyFormat;
+  /** La cotización elegida, para mostrarla. `null` = se ve en pesos. */
+  cotizacion: Cotizacion | null;
+  /** Todas las casas que devolvió la API, para poder elegir. */
+  cotizaciones: Cotizacion[];
   /** Hay una mutación en vuelo contra la base. */
   pending: boolean;
   /** Último error devuelto por el servidor, para mostrarlo en la interfaz. */
@@ -248,10 +260,17 @@ function optimisticReducer(
 
 export function FinanceProvider({
   initialState,
+  cotizaciones,
   children,
 }: {
   /** Estado leído en el servidor. Se refresca solo tras cada Server Action. */
   initialState: FinanceState;
+  /**
+   * Cotizaciones del dólar, leídas en el servidor. Vienen todas y no solo la
+   * elegida para que cambiar de casa se vea al instante, sin ir y volver.
+   * Lista vacía = la API no respondió; se muestra todo en pesos.
+   */
+  cotizaciones: Cotizacion[];
   children: React.ReactNode;
 }) {
   const [state, applyOptimistic] = React.useOptimistic(
@@ -375,15 +394,36 @@ export function FinanceProvider({
     [run, initialState.settings],
   );
 
+  /*
+   * La casa sale del estado optimista, así que al elegir otra los montos
+   * cambian en el acto, sin esperar al servidor. Si la casa guardada ya no
+   * existe (la API dejó de publicarla), `find` devuelve undefined y se cae
+   * elegantemente a pesos.
+   */
+  const cotizacion =
+    cotizaciones.find((item) => item.casa === state.settings.usdCasa) ?? null;
+
+  const moneyFormat = React.useMemo<MoneyFormat>(
+    () => ({
+      currency: state.settings.currency,
+      locale: state.settings.locale,
+      usdRate: cotizacion?.venta ?? null,
+    }),
+    [state.settings.currency, state.settings.locale, cotizacion],
+  );
+
   const value = React.useMemo<FinanceContextValue>(
     () => ({
       state,
+      moneyFormat,
+      cotizacion,
+      cotizaciones,
       pending,
       error,
       dismissError: () => setError(null),
       ...actions,
     }),
-    [state, pending, error, actions],
+    [state, moneyFormat, cotizacion, cotizaciones, pending, error, actions],
   );
 
   return (

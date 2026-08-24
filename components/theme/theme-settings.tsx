@@ -52,7 +52,7 @@ export function ThemeSettings() {
               onClick={() => cambiar({ modo: id })}
               aria-pressed={tema.modo === id}
               className={cn(
-                "flex items-center justify-center gap-1.5 rounded-lg px-2 py-2 text-sm font-medium transition-all duration-200",
+                "flex min-h-11 items-center justify-center gap-1.5 rounded-lg px-2 py-2 text-sm font-medium transition-all duration-200 sm:min-h-9",
                 tema.modo === id
                   ? "bg-brand text-primary-foreground"
                   : "text-muted-foreground hover:text-foreground",
@@ -88,7 +88,7 @@ export function ThemeSettings() {
               aria-pressed={tema.acento === acento.id}
               title={acento.nombre}
               className={cn(
-                "size-8 rounded-full border-2 transition-transform duration-200 hover:scale-110 motion-reduce:hover:scale-100",
+                "relative size-8 rounded-full border-2 transition-transform duration-200 after:absolute after:-inset-1.5 after:content-[''] hover:scale-110 motion-reduce:hover:scale-100 sm:after:content-none",
                 tema.acento === acento.id
                   ? "scale-110 border-foreground"
                   : "border-transparent",
@@ -121,7 +121,7 @@ export function ThemeSettings() {
               onClick={() => cambiar({ radio: radio.id })}
               aria-pressed={tema.radio === radio.id}
               className={cn(
-                "flex flex-col items-center gap-1.5 rounded-lg px-1 py-2 text-xs font-medium transition-all duration-200",
+                "flex min-h-11 flex-col items-center justify-center gap-1.5 rounded-lg px-1 py-2 text-xs font-medium transition-all duration-200 sm:min-h-0",
                 tema.radio === radio.id
                   ? "bg-brand text-primary-foreground"
                   : "text-muted-foreground hover:text-foreground",
@@ -175,7 +175,7 @@ function ColorPropio() {
     <label
       title="Elegir un color"
       className={cn(
-        "relative size-8 cursor-pointer rounded-full border-2 transition-transform duration-200 hover:scale-110 motion-reduce:hover:scale-100",
+        "relative size-8 cursor-pointer rounded-full border-2 transition-transform duration-200 after:absolute after:-inset-1.5 after:content-[''] hover:scale-110 motion-reduce:hover:scale-100 sm:after:content-none",
         elegido ? "scale-110 border-foreground" : "border-transparent",
       )}
       style={{

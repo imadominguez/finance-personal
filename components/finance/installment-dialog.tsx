@@ -3,6 +3,8 @@
 import * as React from "react";
 import { Check, Trash2 } from "lucide-react";
 
+import { useCierreConCambios } from "@/components/finance/cierre-con-cambios";
+import { ConfirmarBorrado } from "@/components/finance/confirmar-borrado";
 import { useFinanceReady } from "@/components/providers/finance-provider";
 import { Button } from "@/components/ui/button";
 import {
@@ -20,7 +22,7 @@ import {
 } from "@/components/ui/native-select";
 import { PAYMENT_METHODS } from "@/lib/constants";
 import { addMonthsToKey, currentMonthKey, formatMonthLong } from "@/lib/date";
-import { formatMoney, parseAmountInput } from "@/lib/format";
+import { formatoDeCuenta, formatMoney, parseAmountInput } from "@/lib/format";
 import type { InstallmentPlan, PaymentMethod } from "@/lib/types";
 
 interface InstallmentDialogProps {
@@ -37,15 +39,21 @@ export function InstallmentDialog({
   onOpenChange,
   plan,
 }: InstallmentDialogProps) {
+  const { alCambiarApertura, propsDelFormulario, confirmacion } =
+    useCierreConCambios(onOpenChange);
+
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog open={open} onOpenChange={alCambiarApertura}>
       <DialogContent className="sm:max-w-md">
         <InstallmentForm
           key={plan?.id ?? "nuevo"}
+          propsDelFormulario={propsDelFormulario}
           plan={plan}
           onDone={() => onOpenChange(false)}
         />
       </DialogContent>
+
+      {confirmacion}
     </Dialog>
   );
 }
@@ -53,9 +61,12 @@ export function InstallmentDialog({
 function InstallmentForm({
   plan,
   onDone,
+  propsDelFormulario,
 }: {
   plan?: InstallmentPlan | null;
   onDone: () => void;
+  /** Detecta que se tocó algo, para no cerrar y perderlo. */
+  propsDelFormulario: React.ComponentProps<"form">;
 }) {
   const { state, addInstallment, updateInstallment, removeInstallment } =
     useFinanceReady();
@@ -88,6 +99,7 @@ function InstallmentForm({
     plan?.method ?? "credito",
   );
   const [error, setError] = React.useState<string | null>(null);
+  const [confirmandoBorrado, setConfirmandoBorrado] = React.useState(false);
 
   const parsedTotal = parseAmountInput(totalAmount);
   const count = Number(installments) || 0;
@@ -139,7 +151,11 @@ function InstallmentForm({
         </DialogDescription>
       </DialogHeader>
 
-      <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+      <form
+        {...propsDelFormulario}
+        onSubmit={handleSubmit}
+        className="flex flex-col gap-4"
+      >
         <div className="flex flex-col gap-1.5">
           <Label htmlFor="plan-description">Qué compraste</Label>
           <Input
@@ -200,7 +216,7 @@ function InstallmentForm({
               Quedan{" "}
               <span className="font-semibold text-brand tabular">
                 {count} ×{" "}
-                {formatMoney(perInstallment, state.settings, {
+                {formatMoney(perInstallment, formatoDeCuenta(state.settings), {
                   decimals: true,
                 })}
               </span>
@@ -282,10 +298,7 @@ function InstallmentForm({
             <Button
               type="button"
               variant="destructive"
-              onClick={() => {
-                removeInstallment(plan.id);
-                onDone();
-              }}
+              onClick={() => setConfirmandoBorrado(true)}
             >
               <Trash2 />
               Borrar
@@ -305,6 +318,21 @@ function InstallmentForm({
           </div>
         </div>
       </form>
+
+      {plan ? (
+        <ConfirmarBorrado
+          abierto={confirmandoBorrado}
+          onOpenChange={setConfirmandoBorrado}
+          que={`el plan de cuotas "${plan.description}"`}
+          consecuencia={
+            "Las cuotas que faltan dejan de aparecer en los próximos meses."
+          }
+          onConfirmar={() => {
+            removeInstallment(plan.id);
+            onDone();
+          }}
+        />
+      ) : null}
     </>
   );
 }

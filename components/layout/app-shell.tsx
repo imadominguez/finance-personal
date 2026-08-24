@@ -4,6 +4,7 @@ import * as React from "react";
 import Link from "next/link";
 import { Plus, Wallet } from "lucide-react";
 
+import { DolarBadge } from "@/components/finance/dolar-badge";
 import { MainNav } from "@/components/layout/main-nav";
 import { UserMenu } from "@/components/layout/user-menu";
 import { TransactionDialog } from "@/components/finance/transaction-dialog";
@@ -50,7 +51,7 @@ export function AppShell({
           <div className="flex h-14 items-center justify-between gap-3">
             <Link
               href="/hoy"
-              className="group flex items-center gap-2 transition-opacity hover:opacity-80"
+              className="group -mx-1 flex h-11 items-center gap-2 px-1 transition-opacity hover:opacity-80 sm:h-auto"
             >
               <span className="brand-gradient flex size-8 items-center justify-center rounded-lg text-primary-foreground shadow-[0_4px_16px_-6px_var(--sombra-marca)] transition-transform duration-300 group-hover:scale-105 motion-reduce:group-hover:scale-100">
                 <Wallet className="size-4" />
@@ -59,6 +60,9 @@ export function AppShell({
                 {APP_NAME}
               </span>
             </Link>
+
+            {/* Solo aparece si se está viendo en dólares. */}
+            <DolarBadge className="mr-auto" />
 
             <div className="flex items-center gap-2">
               <Button
