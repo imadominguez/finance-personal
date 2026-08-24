@@ -92,6 +92,9 @@ hacer. Detalle en `docs/ux/02-voz-y-tono.md` o en la skill `ux-copy`.
 - Contraste 4.5:1 (3:1 para texto grande), en los dos modos y con cualquier
   acento.
 - El color nunca es lo único que comunica: badge = color **+** ícono o texto.
+- Texto del acento **sobre un fondo teñido con el acento** (`bg-brand/10` y
+  compañía) va con `text-brand-realce`, no con `text-brand`: sobre su propio
+  tinte, el acento no llega a 4.5:1.
 - `role="alert"` para errores; `aria-live="polite"` para el resto.
 - Zonas seguras con `--safe-top` y compañía, nunca `env()` suelto.
 

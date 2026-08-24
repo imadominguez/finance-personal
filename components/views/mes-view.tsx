@@ -78,7 +78,7 @@ export function MesView() {
   const hasData = summary.entries.length > 0;
 
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex min-w-0 flex-col gap-4">
       <SummaryHero
         title="¿A dónde se fue tu sueldo?"
         subtitle={formatMonthLong(month)}
@@ -192,124 +192,135 @@ export function MesView() {
             />
           </div>
 
-          <SectionCard
-            title="Distribución del mes"
-            description="Tocá una porción para ver el detalle"
-            delay={120}
-          >
-            <div className="flex flex-col items-center gap-6 sm:flex-row sm:items-center sm:gap-8">
-              <DonutChart
-                slices={donutSlices}
-                activeId={activeCategory}
-                onSliceHover={setActiveCategory}
-                className="shrink-0"
+          {/*
+            De `lg:` para arriba las tarjetas se reparten en dos columnas. No es
+            por llenar el espacio: es para que el mes entre en una pantalla en
+            vez de pedir scroll. En anchos chicos siguen una abajo de la otra.
+          */}
+          <div className="grid gap-4 lg:grid-cols-2 lg:items-start">
+            <div className="flex min-w-0 flex-col gap-4">
+              <SectionCard
+                title="Distribución del mes"
+                description="Tocá una porción para ver el detalle"
+                delay={120}
               >
-                <span className="text-[10px] tracking-wide text-muted-foreground uppercase">
-                  {active ? active.category.name : "Total gastado"}
-                </span>
-                <Money
-                  value={active ? active.total : summary.gastos}
-                  settings={moneyFormat}
-                  compact
-                  className="text-xl font-bold text-brand"
+                <div className="@container flex flex-col items-center gap-6 @md:flex-row @md:items-center @md:gap-8">
+                  <DonutChart
+                    slices={donutSlices}
+                    activeId={activeCategory}
+                    onSliceHover={setActiveCategory}
+                    className="shrink-0"
+                  >
+                    <span className="text-[10px] tracking-wide text-muted-foreground uppercase">
+                      {active ? active.category.name : "Total gastado"}
+                    </span>
+                    <Money
+                      value={active ? active.total : summary.gastos}
+                      settings={moneyFormat}
+                      compact
+                      className="text-xl font-bold text-brand"
+                    />
+                    {active ? (
+                      <span className="text-xs tabular text-muted-foreground">
+                        {Math.round(active.share)}% del mes
+                      </span>
+                    ) : (
+                      <span className="text-xs text-muted-foreground">
+                        {summary.byCategory.length} categorías
+                      </span>
+                    )}
+                  </DonutChart>
+
+                  <ul className="grid w-full flex-1 grid-cols-1 gap-1.5 @lg:grid-cols-2">
+                    {donutSlices.map((slice, index) => {
+                      const item = summary.byCategory[index];
+                      return (
+                        <li key={slice.id}>
+                          <button
+                            type="button"
+                            onMouseEnter={() => setActiveCategory(slice.id)}
+                            onMouseLeave={() => setActiveCategory(null)}
+                            onFocus={() => setActiveCategory(slice.id)}
+                            onBlur={() => setActiveCategory(null)}
+                            className="flex min-h-11 w-full animate-slide-in-right items-center gap-2 rounded-lg px-2 py-1.5 text-left transition-colors hover:bg-surface-raised sm:min-h-0"
+                            style={{ animationDelay: `${index * 55}ms` }}
+                          >
+                            <span
+                              className="size-2.5 shrink-0 rounded-full"
+                              style={{ backgroundColor: slice.color }}
+                            />
+                            <span className="min-w-0 flex-1 truncate text-xs text-muted-foreground">
+                              {item.category.name}
+                            </span>
+                            <span className="shrink-0 text-xs font-medium tabular">
+                              {Math.round(item.share)}%
+                            </span>
+                          </button>
+                        </li>
+                      );
+                    })}
+                  </ul>
+                </div>
+              </SectionCard>
+
+              <SectionCard
+                title="Gasto día por día"
+                description="Las barras punteadas son gastos ya agendados que todavía no ocurrieron"
+                delay={160}
+              >
+                <BarChart
+                  data={dayBars}
+                  formatValue={(value) => formatMoney(value, moneyFormat)}
+                  height={140}
+                  showLabels={false}
                 />
-                {active ? (
-                  <span className="text-xs tabular text-muted-foreground">
-                    {Math.round(active.share)}% del mes
-                  </span>
-                ) : (
-                  <span className="text-xs text-muted-foreground">
-                    {summary.byCategory.length} categorías
-                  </span>
-                )}
-              </DonutChart>
-
-              <ul className="grid w-full flex-1 grid-cols-1 gap-1.5 sm:grid-cols-2">
-                {donutSlices.map((slice, index) => {
-                  const item = summary.byCategory[index];
-                  return (
-                    <li key={slice.id}>
-                      <button
-                        type="button"
-                        onMouseEnter={() => setActiveCategory(slice.id)}
-                        onMouseLeave={() => setActiveCategory(null)}
-                        onFocus={() => setActiveCategory(slice.id)}
-                        onBlur={() => setActiveCategory(null)}
-                        className="flex min-h-11 w-full animate-slide-in-right items-center gap-2 rounded-lg px-2 py-1.5 text-left transition-colors hover:bg-surface-raised sm:min-h-0"
-                        style={{ animationDelay: `${index * 55}ms` }}
-                      >
-                        <span
-                          className="size-2.5 shrink-0 rounded-full"
-                          style={{ backgroundColor: slice.color }}
-                        />
-                        <span className="min-w-0 flex-1 truncate text-xs text-muted-foreground">
-                          {item.category.name}
-                        </span>
-                        <span className="shrink-0 text-xs font-medium tabular">
-                          {Math.round(item.share)}%
-                        </span>
-                      </button>
-                    </li>
-                  );
-                })}
-              </ul>
+                <div className="mt-2 flex justify-between text-[10px] text-muted-foreground">
+                  <span>1</span>
+                  <span>{Math.ceil(days.length / 2)}</span>
+                  <span>{days.length}</span>
+                </div>
+              </SectionCard>
             </div>
-          </SectionCard>
 
-          <SectionCard
-            title="Gasto día por día"
-            description="Las barras punteadas son gastos ya agendados que todavía no ocurrieron"
-            delay={160}
-          >
-            <BarChart
-              data={dayBars}
-              formatValue={(value) => formatMoney(value, moneyFormat)}
-              height={140}
-              showLabels={false}
-            />
-            <div className="mt-2 flex justify-between text-[10px] text-muted-foreground">
-              <span>1</span>
-              <span>{Math.ceil(days.length / 2)}</span>
-              <span>{days.length}</span>
-            </div>
-          </SectionCard>
-
-          <SectionCard
-            title="Mayores gastos"
-            description={`${summary.byCategory.length} categorías en ${formatMonthLong(month)}`}
-            delay={200}
-          >
-            <CategoryBreakdownList
-              items={summary.byCategory}
-              settings={moneyFormat}
-              limit={6}
-            />
-          </SectionCard>
-
-          {summary.ingresosByCategory.length > 0 ? (
-            <SectionCard title="De dónde vino la plata" delay={240}>
-              <CategoryBreakdownList
-                items={summary.ingresosByCategory}
-                settings={moneyFormat}
-                emptyMessage="No registraste ingresos este mes."
-              />
-            </SectionCard>
-          ) : null}
-
-          <SectionCard
-            title="Últimos movimientos"
-            delay={280}
-            action={
-              <Link
-                href="/movimientos"
-                className="flex min-h-11 items-center rounded-lg px-2 text-xs text-muted-foreground transition-colors hover:bg-surface-raised hover:text-brand sm:min-h-6 sm:px-1 sm:hover:bg-transparent"
+            <div className="flex min-w-0 flex-col gap-4">
+              <SectionCard
+                title="Mayores gastos"
+                description={`${summary.byCategory.length} categorías en ${formatMonthLong(month)}`}
+                delay={200}
               >
-                Ver todos
-              </Link>
-            }
-          >
-            <EntryList entries={summary.entries.slice(0, 12)} />
-          </SectionCard>
+                <CategoryBreakdownList
+                  items={summary.byCategory}
+                  settings={moneyFormat}
+                  limit={6}
+                />
+              </SectionCard>
+
+              {summary.ingresosByCategory.length > 0 ? (
+                <SectionCard title="De dónde vino la plata" delay={240}>
+                  <CategoryBreakdownList
+                    items={summary.ingresosByCategory}
+                    settings={moneyFormat}
+                    emptyMessage="No registraste ingresos este mes."
+                  />
+                </SectionCard>
+              ) : null}
+
+              <SectionCard
+                title="Últimos movimientos"
+                delay={280}
+                action={
+                  <Link
+                    href="/movimientos"
+                    className="flex min-h-11 items-center rounded-lg px-2 text-xs text-muted-foreground transition-colors hover:bg-surface-raised hover:text-brand sm:min-h-6 sm:px-1 sm:hover:bg-transparent"
+                  >
+                    Ver todos
+                  </Link>
+                }
+              >
+                <EntryList entries={summary.entries.slice(0, 12)} />
+              </SectionCard>
+            </div>
+          </div>
         </>
       )}
     </div>

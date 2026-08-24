@@ -70,7 +70,7 @@ export function StatCard({
       {format === "count" ? (
         <span
           className={cn(
-            "mt-2 block text-2xl font-bold tracking-tight tabular",
+            "mt-2 block text-xl font-bold tracking-tight sm:text-2xl tabular",
             toneClass,
           )}
         >
@@ -83,7 +83,7 @@ export function StatCard({
           signed={signed}
           animate
           className={cn(
-            "mt-2 block text-2xl font-bold tracking-tight",
+            "mt-2 block text-xl font-bold tracking-tight sm:text-2xl",
             toneClass,
           )}
         />

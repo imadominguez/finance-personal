@@ -70,7 +70,7 @@ export function HoyView() {
   }
 
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex min-w-0 flex-col gap-4">
       <SummaryHero
         title={isToday ? "¿Cuánto llevás gastado hoy?" : "Gastos del día"}
         subtitle={formatDayLong(date)}
@@ -174,62 +174,69 @@ export function HoyView() {
         />
       </div>
 
-      <SectionCard
-        title="En qué gastaste"
-        description={`${summary.byCategory.length} categoría${summary.byCategory.length === 1 ? "" : "s"} este día`}
-        delay={100}
-      >
-        <CategoryBreakdownList
-          items={summary.byCategory}
-          settings={moneyFormat}
-          emptyMessage="No registraste gastos en este día."
-        />
-      </SectionCard>
-
-      <SectionCard
-        title="Movimientos del día"
-        delay={160}
-        action={
-          <Link
-            href="/movimientos"
-            className="flex min-h-11 items-center rounded-lg px-2 text-xs text-muted-foreground transition-colors hover:bg-surface-raised hover:text-brand sm:min-h-6 sm:px-1 sm:hover:bg-transparent"
+      {/* Dos columnas cuando hay lugar: el día entero sin scrollear. */}
+      <div className="grid gap-4 lg:grid-cols-2 lg:items-start">
+        <div className="flex min-w-0 flex-col gap-4">
+          <SectionCard
+            title="En qué gastaste"
+            description={`${summary.byCategory.length} categoría${summary.byCategory.length === 1 ? "" : "s"} este día`}
+            delay={100}
           >
-            Ver todos
-          </Link>
-        }
-      >
-        <EntryList
-          entries={summary.entries}
-          groupByDate={false}
-          emptyMessage="Todavía no cargaste nada este día."
-        />
-      </SectionCard>
-
-      <SectionCard title="Este mes" delay={220}>
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <div>
-            <p className="text-xs text-muted-foreground">
-              Gastado en {formatMonthLong(month)}
-            </p>
-            <Money
-              value={monthSummary.gastos}
+            <CategoryBreakdownList
+              items={summary.byCategory}
               settings={moneyFormat}
-              className="text-xl font-bold text-brand"
+              emptyMessage="No registraste gastos en este día."
             />
-          </div>
-          <Button variant="outline" size="lg" render={<Link href="/mes" />}>
-            <CalendarDays />
-            Ver el mes completo
-          </Button>
+          </SectionCard>
         </div>
-      </SectionCard>
+
+        <div className="flex min-w-0 flex-col gap-4">
+          <SectionCard
+            title="Movimientos del día"
+            delay={160}
+            action={
+              <Link
+                href="/movimientos"
+                className="flex min-h-11 items-center rounded-lg px-2 text-xs text-muted-foreground transition-colors hover:bg-surface-raised hover:text-brand sm:min-h-6 sm:px-1 sm:hover:bg-transparent"
+              >
+                Ver todos
+              </Link>
+            }
+          >
+            <EntryList
+              entries={summary.entries}
+              groupByDate={false}
+              emptyMessage="Todavía no cargaste nada este día."
+            />
+          </SectionCard>
+
+          <SectionCard title="Este mes" delay={220}>
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <div>
+                <p className="text-xs text-muted-foreground">
+                  Gastado en {formatMonthLong(month)}
+                </p>
+                <Money
+                  value={monthSummary.gastos}
+                  settings={moneyFormat}
+                  className="text-xl font-bold text-brand"
+                />
+              </div>
+              <Button variant="outline" size="lg" render={<Link href="/mes" />}>
+                <CalendarDays />
+                Ver el mes completo
+              </Button>
+            </div>
+          </SectionCard>
+        </div>
+      </div>
     </div>
   );
 }
 
 function FirstRun({ onLoadSample }: { onLoadSample: () => void }) {
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex min-w-0 flex-col gap-4">
       <SummaryHero
         title="Empezá a llevar tus finanzas"
         subtitle="Todavía no hay nada cargado"
