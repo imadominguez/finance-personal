@@ -4,6 +4,7 @@ import { FinanceProvider } from "@/components/providers/finance-provider";
 import { SincronizarTema } from "@/components/theme/sync-tema";
 import { getCurrentUser, requireSession } from "@/lib/auth/dal";
 import { getFinanceState } from "@/lib/db/finance-repository";
+import { getCotizaciones } from "@/lib/dolar";
 import { getSavedTheme } from "@/lib/db/theme";
 
 /**
@@ -13,14 +14,17 @@ import { getSavedTheme } from "@/lib/db/theme";
  */
 export default async function AppLayout({ children }: LayoutProps<"/">) {
   const { userId } = await requireSession();
-  const [state, user, tema] = await Promise.all([
+  const [state, user, tema, cotizaciones] = await Promise.all([
     getFinanceState(userId),
     getCurrentUser(),
     getSavedTheme(userId),
+    // Cacheada y compartida por todos: una llamada cada diez minutos para toda
+    // la app. Si falla devuelve [] y los montos se ven en pesos.
+    getCotizaciones(),
   ]);
 
   return (
-    <FinanceProvider initialState={state}>
+    <FinanceProvider initialState={state} cotizaciones={cotizaciones}>
       {/* Trae a este equipo la apariencia guardada en la cuenta, y viceversa. */}
       <SincronizarTema tema={tema} />
       <TooltipProvider>

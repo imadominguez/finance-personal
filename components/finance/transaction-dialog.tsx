@@ -21,7 +21,7 @@ import {
 } from "@/components/ui/native-select";
 import { PAYMENT_METHODS } from "@/lib/constants";
 import { todayKey } from "@/lib/date";
-import { formatMoney, parseAmountInput } from "@/lib/format";
+import { formatoDeCuenta, formatMoney, parseAmountInput } from "@/lib/format";
 import { cn } from "@/lib/utils";
 import type { MovementKind, PaymentMethod, Transaction } from "@/lib/types";
 
@@ -83,8 +83,13 @@ function TransactionForm({
   defaultKind,
   defaultDate,
 }: TransactionFormProps) {
-  const { state, addTransaction, updateTransaction, removeTransaction } =
-    useFinanceReady();
+  const {
+    state,
+    moneyFormat,
+    addTransaction,
+    updateTransaction,
+    removeTransaction,
+  } = useFinanceReady();
 
   const categoriesFor = React.useCallback(
     (kind: MovementKind) =>
@@ -220,9 +225,24 @@ function TransactionForm({
             className="h-12 text-2xl font-bold tabular"
           />
           <p className="h-4 text-xs text-muted-foreground">
-            {Number.isFinite(parsedAmount) && parsedAmount > 0
-              ? formatMoney(parsedAmount, state.settings, { decimals: true })
-              : ""}
+            {Number.isFinite(parsedAmount) && parsedAmount > 0 ? (
+              <>
+                {formatMoney(parsedAmount, formatoDeCuenta(state.settings), {
+                  decimals: true,
+                })}
+                {/*
+                  El campo va siempre en la moneda de la cuenta, aunque se esté
+                  mirando todo en dólares: acá se agrega el equivalente para no
+                  tener que hacer la cuenta de cabeza.
+                */}
+                {moneyFormat.usdRate ? (
+                  <span className="text-brand">
+                    {" ≈ "}
+                    {formatMoney(parsedAmount, moneyFormat)}
+                  </span>
+                ) : null}
+              </>
+            ) : null}
           </p>
         </div>
 

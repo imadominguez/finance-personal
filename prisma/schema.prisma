@@ -74,6 +74,11 @@ model Settings {
   locale        String  @default("es-AR")
   displayName   String  @default("")
 
+  /// Casa de cambio con la que se muestran los montos en dólares (`blue`,
+  /// `oficial`, `bolsa`…). `null` = se muestran en la moneda de la cuenta.
+  /// Es solo una forma de mirar: los montos se siguen guardando en pesos.
+  usdCasa String?
+
   /// Apariencia: modo, acento y radio. Guardada como JSON porque es una
   /// preferencia de interfaz, no algo que se consulte ni se filtre.
   /// `null` = nunca se tocó, vale el tema original de la app.

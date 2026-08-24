@@ -23,7 +23,7 @@ type KindFilter = MovementKind | "todos";
 
 /** Historial completo con filtros. Incluye fijos y cuotas proyectados. */
 export function MovimientosView() {
-  const { state } = useFinanceReady();
+  const { state, moneyFormat } = useFinanceReady();
 
   const [search, setSearch] = React.useState("");
   const [kind, setKind] = React.useState<KindFilter>("todos");
@@ -190,7 +190,7 @@ export function MovimientosView() {
           value={
             <Money
               value={totals.gastos}
-              settings={state.settings}
+              settings={moneyFormat}
               compact
               className="text-brand"
             />
@@ -202,7 +202,7 @@ export function MovimientosView() {
           value={
             <Money
               value={totals.ingresos}
-              settings={state.settings}
+              settings={moneyFormat}
               compact
               className="text-success"
             />

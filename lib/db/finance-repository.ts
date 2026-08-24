@@ -34,6 +34,7 @@ export async function getFinanceState(userId: string): Promise<FinanceState> {
           currency: true,
           locale: true,
           displayName: true,
+          usdCasa: true,
         },
       }),
       prisma.category.findMany({

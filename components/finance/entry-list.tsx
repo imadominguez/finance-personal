@@ -29,7 +29,7 @@ export function EntryList({
   className,
   maxAnimatedIndex = 14,
 }: EntryListProps) {
-  const { state } = useFinanceReady();
+  const { state, moneyFormat } = useFinanceReady();
   const [editingId, setEditingId] = React.useState<string | null>(null);
 
   const editing = React.useMemo(
@@ -80,7 +80,7 @@ export function EntryList({
                   </h3>
                   <Money
                     value={dayTotal}
-                    settings={state.settings}
+                    settings={moneyFormat}
                     className="text-xs tabular text-muted-foreground"
                   />
                 </header>
@@ -155,7 +155,7 @@ function EntryRow({
   categoryName,
   onEdit,
 }: EntryRowProps) {
-  const { state } = useFinanceReady();
+  const { moneyFormat } = useFinanceReady();
   const isGasto = entry.kind === "gasto";
 
   const content = (
@@ -191,7 +191,7 @@ function EntryRow({
 
       <Money
         value={entry.amount}
-        settings={state.settings}
+        settings={moneyFormat}
         className={cn(
           "shrink-0 text-sm font-semibold",
           isGasto ? "text-brand" : "text-success",

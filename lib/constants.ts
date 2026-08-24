@@ -10,6 +10,7 @@ export const DEFAULT_SETTINGS: Settings = {
   currency: "ARS",
   locale: "es-AR",
   displayName: "",
+  usdCasa: null,
 };
 
 export const PAYMENT_METHODS: { value: PaymentMethod; label: string }[] = [

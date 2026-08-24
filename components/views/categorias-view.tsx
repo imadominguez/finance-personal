@@ -15,7 +15,7 @@ import type { Category, MovementKind } from "@/lib/types";
 
 /** ABM de categorías, con el total del año al lado de cada una. */
 export function CategoriasView() {
-  const { state } = useFinanceReady();
+  const { state, moneyFormat } = useFinanceReady();
   const [editing, setEditing] = React.useState<Category | null>(null);
   const [open, setOpen] = React.useState(false);
   const [defaultKind, setDefaultKind] = React.useState<MovementKind>("gasto");
@@ -72,7 +72,7 @@ export function CategoriasView() {
               </div>
               <Money
                 value={totalsByCategory.get(category.id) ?? 0}
-                settings={state.settings}
+                settings={moneyFormat}
                 compact
                 className={`shrink-0 text-sm font-semibold ${
                   category.kind === "gasto" ? "text-brand" : "text-success"

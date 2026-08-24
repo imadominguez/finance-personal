@@ -5,11 +5,12 @@ import * as React from "react";
 import { useCountUp } from "@/hooks/use-count-up";
 import { formatMoney } from "@/lib/format";
 import { cn } from "@/lib/utils";
-import type { Settings } from "@/lib/types";
+import type { MoneyFormat } from "@/lib/types";
 
 interface MoneyProps extends Omit<React.ComponentProps<"span">, "children"> {
   value: number;
-  settings: Pick<Settings, "currency" | "locale">;
+  /** Cómo dibujar el monto. Sale de `moneyFormat`, no de `state.settings`. */
+  settings: MoneyFormat;
   signed?: boolean;
   decimals?: boolean;
   compact?: boolean;
@@ -34,7 +35,17 @@ export function Money({
   const shown = useCountUp(value, animate ? duration : 0);
 
   return (
-    <span className={cn("tabular", className)} {...props}>
+    /*
+     * `suppressHydrationWarning` por la notación compacta: Node y el navegador
+     * traen versiones distintas de ICU y escriben el sufijo con distinta caja
+     * ("$ 775 K" contra "$ 775 k"). Es la misma cifra; sin esto React
+     * considera que el árbol no coincide y lo vuelve a dibujar entero.
+     */
+    <span
+      className={cn("tabular", className)}
+      suppressHydrationWarning
+      {...props}
+    >
       {formatMoney(shown, settings, { signed, decimals, compact })}
     </span>
   );

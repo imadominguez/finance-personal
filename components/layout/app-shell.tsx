@@ -4,6 +4,7 @@ import * as React from "react";
 import Link from "next/link";
 import { Plus, Wallet } from "lucide-react";
 
+import { DolarBadge } from "@/components/finance/dolar-badge";
 import { MainNav } from "@/components/layout/main-nav";
 import { UserMenu } from "@/components/layout/user-menu";
 import { TransactionDialog } from "@/components/finance/transaction-dialog";
@@ -59,6 +60,9 @@ export function AppShell({
                 {APP_NAME}
               </span>
             </Link>
+
+            {/* Solo aparece si se está viendo en dólares. */}
+            <DolarBadge className="mr-auto" />
 
             <div className="flex items-center gap-2">
               <Button

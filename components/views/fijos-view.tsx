@@ -29,7 +29,7 @@ import type { InstallmentPlan, RecurringRule } from "@/lib/types";
  * No se guardan movimientos duplicados; se calculan al leer.
  */
 export function FijosView() {
-  const { state, updateRecurring } = useFinanceReady();
+  const { state, updateRecurring, moneyFormat } = useFinanceReady();
   const month = currentMonthKey();
 
   const [editingRule, setEditingRule] = React.useState<RecurringRule | null>(
@@ -92,7 +92,7 @@ export function FijosView() {
         <StatCard
           label="Fijos del mes"
           value={fixedExpenses}
-          settings={state.settings}
+          settings={moneyFormat}
           icon={Repeat}
           tone="gasto"
           delay={60}
@@ -101,7 +101,7 @@ export function FijosView() {
         <StatCard
           label="Cuotas del mes"
           value={installmentsThisMonth}
-          settings={state.settings}
+          settings={moneyFormat}
           icon={CreditCard}
           tone="gasto"
           delay={110}
@@ -110,7 +110,7 @@ export function FijosView() {
         <StatCard
           label="Ingresos fijos"
           value={fixedIncome}
-          settings={state.settings}
+          settings={moneyFormat}
           icon={Repeat}
           tone="ingreso"
           delay={160}
@@ -196,7 +196,7 @@ export function FijosView() {
 
                     <Money
                       value={rule.amount}
-                      settings={state.settings}
+                      settings={moneyFormat}
                       className={`shrink-0 text-sm font-semibold ${
                         rule.kind === "gasto" ? "text-brand" : "text-success"
                       }`}
@@ -287,7 +287,7 @@ export function FijosView() {
                               plan,
                               Math.max(currentIndex, 0),
                             )}
-                            settings={state.settings}
+                            settings={moneyFormat}
                             className="shrink-0 text-sm font-semibold text-brand"
                           />
                         </div>
@@ -306,7 +306,7 @@ export function FijosView() {
                         className="flex-1"
                       />
                       <span className="shrink-0 text-xs tabular text-muted-foreground">
-                        {formatMoney(plan.totalAmount, state.settings, {
+                        {formatMoney(plan.totalAmount, moneyFormat, {
                           compact: true,
                         })}
                       </span>

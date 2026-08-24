@@ -44,7 +44,13 @@ export function normalizeState(input: unknown): FinanceState {
 
   return {
     version: STATE_VERSION,
-    settings: { ...base.settings, ...(raw.settings ?? {}) },
+    settings: {
+      ...base.settings,
+      ...(raw.settings ?? {}),
+      // La casa termina en la base y se compara contra lo que devuelve la API:
+      // se acepta solo si tiene forma de casa, no lo que traiga el archivo.
+      usdCasa: casaValida(raw.settings?.usdCasa),
+    },
     categories:
       Array.isArray(raw.categories) && raw.categories.length > 0
         ? raw.categories
@@ -55,6 +61,13 @@ export function normalizeState(input: unknown): FinanceState {
       : [],
     installments: Array.isArray(raw.installments) ? raw.installments : [],
   };
+}
+
+/** Devuelve la casa si parece una, o `null`. */
+function casaValida(valor: unknown): string | null {
+  return typeof valor === "string" && /^[a-z]{1,40}$/.test(valor)
+    ? valor
+    : null;
 }
 
 export function stateToJson(state: FinanceState): string {

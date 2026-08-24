@@ -139,6 +139,7 @@ type SettingsRow = {
   currency: string;
   locale: string;
   displayName: string;
+  usdCasa: string | null;
 };
 
 export function toSettings(row: SettingsRow): Settings {
@@ -147,5 +148,6 @@ export function toSettings(row: SettingsRow): Settings {
     currency: row.currency,
     locale: row.locale,
     displayName: row.displayName,
+    usdCasa: row.usdCasa,
   };
 }

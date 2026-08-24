@@ -6,7 +6,8 @@ Registrás lo que gastás y lo que cobrás, y la app te dice en qué se te está
 Construida con **Next.js 16 (App Router)**, **React 19**, **Tailwind CSS v4**, componentes
 **shadcn/ui** sobre Base UI, y **PostgreSQL con Prisma 7**. El diseño sigue `DESIGN.md`:
 oscuro y naranja de fábrica, animaciones suaves, y cada persona puede cambiarle el
-modo, el color y los bordes desde Ajustes.
+modo, el color y los bordes desde Ajustes. También puede ver todos sus montos
+expresados en dólares, al tipo de cambio que elija.
 
 ## Qué hace
 
@@ -293,11 +294,23 @@ lib/
   finance.ts            Lógica de negocio pura (expansión, totales, presupuesto)
   date.ts               Períodos y formato de fechas en español
   format.ts             Moneda, porcentajes y parseo de montos
+  dolar.ts              Cotizaciones del dólar (dolarapi.com), cacheadas y validadas
+  theme.ts              Modos, acentos y el ajuste de contraste del color propio
   storage.ts            Formato de respaldo JSON y lectura del localStorage viejo
 ```
 
 ## Decisiones que vale la pena conocer
 
+- **El dólar es una forma de mirar, no una conversión de los datos.** Los montos se
+  guardan siempre en la moneda de la cuenta; elegir "ver en dólar blue" solo cambia el
+  formato al dibujar (`lib/format.ts`), así que volver a pesos no pierde nada y la
+  cotización de hoy nunca queda escrita adentro de un movimiento. Los campos donde se
+  escribe un monto siguen en pesos, con el equivalente al lado.
+- **Un tercero caído no rompe una pantalla.** `lib/dolar.ts` valida lo que llega de
+  dolarapi.com con Zod, corta a los 3 segundos y ante cualquier problema devuelve una
+  lista vacía: la app se muestra en pesos y avisa. La respuesta se cachea 10 minutos y la
+  comparten todos los usuarios, así que es una sola llamada cada diez minutos para toda
+  la app.
 - **Tema personalizable con una sola variable.** `:root` es el modo claro y `.dark` el
   oscuro; el acento entra por `--brand` y todo lo demás (`--primary`, `--ring`, los
   `--chart-*`, la barra lateral, los degradados) se deriva con `color-mix`. Cambiar de
