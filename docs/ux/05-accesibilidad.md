@@ -47,6 +47,12 @@ como falla.
   color + ícono o texto.
 - El zoom del navegador al 200% no puede romper ni esconder nada.
 
+**Texto del acento sobre un fondo teñido con el acento** (un chip, el tab
+activo) no llega a 4.5:1 con `text-brand`: el fondo es el mismo color aclarado.
+Para eso está `text-brand-realce`, que se corre hacia el negro en claro y hacia
+el blanco en oscuro. Siempre que se use `bg-brand/10` y compañía como fondo, el
+texto va con ese token.
+
 El acento es configurable, así que el contraste no se verifica de a un color:
 `lib/theme.ts` ajusta cualquier color elegido a mano hasta llegar a 4.5:1, y la
 auditoría lo mide sobre la pantalla real.

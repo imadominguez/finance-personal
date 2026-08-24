@@ -44,6 +44,7 @@
   --color-brand: var(--brand);
   --color-brand-light: var(--brand-light);
   --color-brand-dark: var(--brand-dark);
+  --color-brand-realce: var(--brand-realce);
   --color-surface: var(--surface);
   --color-surface-raised: var(--surface-raised);
   --color-hairline: var(--hairline);
@@ -279,6 +280,8 @@
    */
   --brand-light: color-mix(in oklab, var(--brand), black 8%);
   --brand-dark: color-mix(in oklab, var(--brand), black 26%);
+  /* Para texto sobre un fondo teñido con el propio acento (chips, tab activo). */
+  --brand-realce: color-mix(in oklab, var(--brand), black 32%);
 
   /* Misma idea para la rampa de gráficos: cada paso, más oscuro que el anterior. */
   --chart-2: color-mix(in oklab, var(--brand), black 12%);
@@ -347,6 +350,7 @@
 
   --brand-light: color-mix(in oklab, var(--brand), white 20%);
   --brand-dark: color-mix(in oklab, var(--brand), black 16%);
+  --brand-realce: color-mix(in oklab, var(--brand), white 22%);
 
   --chart-2: color-mix(in oklab, var(--brand), white 16%);
   --chart-3: color-mix(in oklab, var(--brand), white 32%);

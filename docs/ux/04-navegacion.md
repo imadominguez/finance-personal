@@ -67,21 +67,31 @@ Solo intercepta los cierres **implícitos** —tocar afuera, `Esc`, la cruz—.
 
 ## 4.4 Navegación entre secciones
 
-Siete secciones. En el teléfono no entran en una fila.
+Siete secciones no entran en una fila en un teléfono. Y el marco de la app está
+limitado a 768 px —crece a 1024 recién en pantallas grandes—, así que tampoco
+hay un ancho donde entren cómodas: los siete tabs piden 730 px de los 736
+disponibles.
 
-**Cómo está hoy:** una fila que se scrollea de costado.
+**Cómo era:** una fila que se scrolleaba de costado. Lo que quedaba fuera de la
+pantalla no existía: a 360 px se veían tres secciones y media y el resto había
+que descubrirlas arrastrando, sin ninguna señal de que estaban ahí.
 
-**Problema:** lo que queda fuera de la pantalla no existe. A 360 px se ven tres
-secciones y media; las otras hay que descubrirlas arrastrando, sin ninguna señal
-de que están ahí.
+**Cómo es:**
 
-**Criterio para resolverlo** (ver [`06-pantallas.md`](06-pantallas.md)):
+- **Hoy · Mes · Año** siempre a la vista. Son el corazón de la app y lo que se
+  mira todos los días.
+- **Más** abre una hoja con las otras cuatro —Movimientos, Fijos y cuotas,
+  Categorías, Ajustes—, cada una con una línea que dice para qué sirve. Ese
+  espacio no existía en un tab.
+- **Igual en todos los tamaños.** No cambia el gesto entre el teléfono y la
+  compu: se aprende una vez. Y Ajustes sigue estando a un toque desde el menú de
+  la cuenta, en cualquier ancho.
+- La sección actual siempre marcada con `aria-current="page"`, y **"Más" queda
+  marcado** cuando estás en una de las que agrupa: si no, al entrar a
+  Movimientos no habría nada indicando dónde estás.
 
-- Las tres vistas de período —Hoy, Mes, Año— son el corazón de la app y tienen
-  que estar **siempre visibles**, sin scroll.
-- El resto —Movimientos, Fijos, Categorías, Ajustes— son secundarias y pueden
-  vivir detrás de un acceso único.
-- La sección actual siempre marcada, con `aria-current="page"`.
+En el teléfono los cuatro tabs se reparten el ancho en partes iguales; con lugar
+de sobra cada uno ocupa lo suyo y quedan juntos a la izquierda.
 
 ---
 

@@ -47,7 +47,7 @@ export function AppShell({
   return (
     <div className="flex min-h-dvh flex-col">
       <header className="sticky top-0 z-40 border-b border-hairline bg-background/85 pt-(--safe-top) backdrop-blur-xl">
-        <div className="mx-auto w-full max-w-3xl pr-[max(1rem,var(--safe-right))] pl-[max(1rem,var(--safe-left))]">
+        <div className="mx-auto w-full max-w-3xl lg:max-w-5xl pr-[max(1rem,var(--safe-right))] pl-[max(1rem,var(--safe-left))]">
           <div className="flex h-14 items-center justify-between gap-3">
             <Link
               href="/hoy"
@@ -83,11 +83,11 @@ export function AppShell({
         </div>
       </header>
 
-      <main className="mx-auto w-full max-w-3xl flex-1 pt-5 pr-[max(1rem,var(--safe-right))] pb-[calc(6rem+var(--safe-bottom))] pl-[max(1rem,var(--safe-left))] sm:pb-[calc(2.5rem+var(--safe-bottom))]">
+      <main className="mx-auto w-full max-w-3xl lg:max-w-5xl flex-1 pt-5 pr-[max(1rem,var(--safe-right))] pb-[calc(6rem+var(--safe-bottom))] pl-[max(1rem,var(--safe-left))] sm:pb-[calc(2.5rem+var(--safe-bottom))]">
         {children}
       </main>
 
-      <footer className="mx-auto w-full max-w-3xl pr-24 pb-[calc(1.5rem+var(--safe-bottom))] pl-[max(1rem,var(--safe-left))] text-center text-xs text-muted-foreground sm:pr-[max(1rem,var(--safe-right))]">
+      <footer className="mx-auto w-full max-w-3xl lg:max-w-5xl pr-24 pb-[calc(1.5rem+var(--safe-bottom))] pl-[max(1rem,var(--safe-left))] text-center text-xs text-muted-foreground sm:pr-[max(1rem,var(--safe-right))]">
         Tus datos están guardados en tu cuenta. Podés exportarlos desde{" "}
         <Link
           href="/ajustes"
