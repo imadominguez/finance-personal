@@ -39,7 +39,7 @@ import { formatMoney } from "@/lib/format";
 
 /** Vista anual: tendencia mes a mes y en qué se fue el año. */
 export function AnioView() {
-  const { state, loadSampleData } = useFinanceReady();
+  const { state, loadSampleData, moneyFormat } = useFinanceReady();
   const [year, setYear] = React.useState(currentYear());
 
   const period: Period = { kind: "anio", year };
@@ -86,7 +86,7 @@ export function AnioView() {
         title="Tu año en números"
         subtitle={`Enero a diciembre de ${year}`}
         amount={summary.gastos}
-        settings={state.settings}
+        settings={moneyFormat}
         comparison={comparison}
         comparisonLabel="vs. año anterior"
       />
@@ -119,7 +119,7 @@ export function AnioView() {
             <StatCard
               label="Gastos del año"
               value={summary.gastos}
-              settings={state.settings}
+              settings={moneyFormat}
               icon={ArrowDownRight}
               tone="gasto"
               delay={60}
@@ -127,7 +127,7 @@ export function AnioView() {
             <StatCard
               label="Ingresos del año"
               value={summary.ingresos}
-              settings={state.settings}
+              settings={moneyFormat}
               icon={ArrowUpRight}
               tone="ingreso"
               delay={110}
@@ -135,7 +135,7 @@ export function AnioView() {
             <StatCard
               label="Balance"
               value={summary.balance}
-              settings={state.settings}
+              settings={moneyFormat}
               icon={Scale}
               tone="balance"
               signed
@@ -145,7 +145,7 @@ export function AnioView() {
             <StatCard
               label="Promedio mensual"
               value={average}
-              settings={state.settings}
+              settings={moneyFormat}
               icon={TrendingUp}
               delay={210}
               hint={`Sobre ${pastMonths.length} mes${pastMonths.length === 1 ? "" : "es"}`}
@@ -159,7 +159,7 @@ export function AnioView() {
           >
             <BarChart
               data={bars}
-              formatValue={(value) => formatMoney(value, state.settings)}
+              formatValue={(value) => formatMoney(value, moneyFormat)}
               height={170}
             />
           </SectionCard>
@@ -170,7 +170,7 @@ export function AnioView() {
                 label="Mes más caro"
                 month={mostExpensive.month}
                 amount={mostExpensive.gastos}
-                settings={state.settings}
+                settings={moneyFormat}
                 tone="alto"
                 delay={180}
               />
@@ -178,7 +178,7 @@ export function AnioView() {
                 label="Mes más barato"
                 month={cheapest.month}
                 amount={cheapest.gastos}
-                settings={state.settings}
+                settings={moneyFormat}
                 tone="bajo"
                 delay={220}
               />
@@ -231,7 +231,7 @@ export function AnioView() {
 
                       <Money
                         value={month.gastos}
-                        settings={state.settings}
+                        settings={moneyFormat}
                         className="shrink-0 text-right text-xs font-semibold whitespace-nowrap text-brand sm:text-sm"
                       />
 
@@ -258,7 +258,7 @@ export function AnioView() {
           >
             <CategoryBreakdownList
               items={summary.byCategory}
-              settings={state.settings}
+              settings={moneyFormat}
               limit={8}
             />
           </SectionCard>

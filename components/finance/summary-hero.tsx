@@ -6,13 +6,14 @@ import { Money } from "@/components/finance/money";
 import { ProgressBar } from "@/components/finance/progress-bar";
 import { TrendBadge } from "@/components/finance/trend-badge";
 import { cn } from "@/lib/utils";
-import type { Comparison, Settings } from "@/lib/types";
+import type { Comparison, MoneyFormat } from "@/lib/types";
 
 interface SummaryHeroProps {
   title: string;
   subtitle: string;
   amount: number;
-  settings: Settings;
+  /** Cómo dibujar los montos. Sale de `moneyFormat`, no de `state.settings`. */
+  settings: MoneyFormat;
   /** Barra de avance opcional (gasto sobre presupuesto). */
   progress?: {
     value: number;

@@ -86,6 +86,16 @@ export const settingsSchema = z.object({
   currency: z.string().trim().length(3),
   locale: z.string().trim().min(2).max(10),
   displayName: z.string().trim().max(60),
+  /*
+   * Casa de cambio, o null para ver en pesos. Se valida como slug y no contra
+   * una lista cerrada a propósito: si dolarapi suma una casa nueva, la app la
+   * muestra sin necesidad de tocar este archivo. El valor no se interpola en
+   * ningún lado, solo se compara contra lo que devolvió la API.
+   */
+  usdCasa: z
+    .string()
+    .regex(/^[a-z]{1,40}$/, "Esa cotización no existe")
+    .nullable(),
 });
 
 /**

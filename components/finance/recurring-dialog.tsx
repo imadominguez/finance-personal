@@ -19,7 +19,7 @@ import {
   NativeSelectOption,
 } from "@/components/ui/native-select";
 import { currentMonthKey } from "@/lib/date";
-import { formatMoney, parseAmountInput } from "@/lib/format";
+import { formatoDeCuenta, formatMoney, parseAmountInput } from "@/lib/format";
 import { cn } from "@/lib/utils";
 import type { MovementKind, RecurringRule } from "@/lib/types";
 
@@ -178,7 +178,7 @@ function RecurringForm({
             />
             <p className="h-4 text-xs text-muted-foreground">
               {Number.isFinite(parsedAmount) && parsedAmount > 0
-                ? formatMoney(parsedAmount, state.settings)
+                ? formatMoney(parsedAmount, formatoDeCuenta(state.settings))
                 : ""}
             </p>
           </div>

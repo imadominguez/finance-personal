@@ -105,6 +105,8 @@ export async function importStateAction(json: string): Promise<ActionResult> {
       currency: incoming.settings.currency ?? DEFAULT_SETTINGS.currency,
       locale: incoming.settings.locale ?? DEFAULT_SETTINGS.locale,
       displayName: incoming.settings.displayName ?? "",
+      // Ya viene saneada por `normalizeState`.
+      usdCasa: incoming.settings.usdCasa,
     },
   });
 

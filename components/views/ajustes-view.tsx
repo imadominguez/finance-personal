@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 
 import { deleteAccountAction, logoutAction } from "@/app/actions/auth";
+import { DolarSettings } from "@/components/finance/dolar-settings";
 import { SectionCard } from "@/components/finance/section-card";
 import { InstallButton } from "@/components/pwa/install-button";
 import { ThemeSettings } from "@/components/theme/theme-settings";
@@ -26,7 +27,7 @@ import {
   NativeSelectOption,
 } from "@/components/ui/native-select";
 import { CURRENCIES } from "@/lib/constants";
-import { formatMoney, parseAmountInput } from "@/lib/format";
+import { formatoDeCuenta, formatMoney, parseAmountInput } from "@/lib/format";
 import {
   clearLegacyLocalState,
   readLegacyLocalState,
@@ -143,7 +144,7 @@ export function AjustesView({ user }: AjustesViewProps) {
             />
             <p className="h-4 text-xs text-muted-foreground">
               {Number.isFinite(parsedBudget) && parsedBudget > 0
-                ? formatMoney(parsedBudget, state.settings)
+                ? formatMoney(parsedBudget, formatoDeCuenta(state.settings))
                 : "Dejalo en blanco para no mostrar la barra de avance."}
             </p>
           </div>
@@ -206,9 +207,17 @@ export function AjustesView({ user }: AjustesViewProps) {
             ))}
           </NativeSelect>
           <p className="mt-1 text-xs text-muted-foreground">
-            Ejemplo: {formatMoney(1234567, state.settings)}
+            Ejemplo: {formatMoney(1234567, formatoDeCuenta(state.settings))}
           </p>
         </div>
+      </SectionCard>
+
+      <SectionCard
+        title="Ver en dólares"
+        description="Los mismos números, expresados al dólar que elijas"
+        delay={150}
+      >
+        <DolarSettings />
       </SectionCard>
 
       <SectionCard

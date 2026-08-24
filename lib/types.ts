@@ -88,6 +88,40 @@ export interface Settings {
   locale: string;
   /** Nombre para saludar en el dashboard. Opcional. */
   displayName: string;
+  /**
+   * Casa de cambio elegida para ver los montos en dólares (`blue`, `oficial`,
+   * `bolsa`…). `null` = se muestran en la moneda de la cuenta.
+   *
+   * Es solo una forma de mirar los mismos números: lo que se guarda en la base
+   * sigue siendo en pesos, y la conversión se hace al mostrar.
+   */
+  usdCasa: string | null;
+}
+
+/** Una cotización del dólar, tal como la deja `lib/dolar.ts`. */
+export interface Cotizacion {
+  /** Identificador de la casa: `oficial`, `blue`, `bolsa`, `tarjeta`… */
+  casa: string;
+  nombre: string;
+  /** Cuántos pesos vale un dólar. Es el número con el que se convierte. */
+  venta: number;
+  compra: number | null;
+  /** ISO de la última actualización según la API. */
+  actualizado: string | null;
+}
+
+/**
+ * Con qué reglas se dibuja un monto en pantalla.
+ *
+ * Sale de los ajustes, pero no es lo mismo: si la persona eligió ver en
+ * dólares, acá viene el valor con el que dividir y la moneda ya cambiada.
+ * Los montos guardados no se tocan nunca.
+ */
+export interface MoneyFormat {
+  currency: string;
+  locale: string;
+  /** Cuántos pesos vale un dólar. `null` = mostrar en la moneda de la cuenta. */
+  usdRate: number | null;
 }
 
 export interface FinanceState {

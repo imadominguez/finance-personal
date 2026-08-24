@@ -95,7 +95,7 @@ export function FeatureCard({
   children: React.ReactNode;
 }) {
   return (
-    <div className="group surface-card relative overflow-hidden rounded-2xl p-5 transition-all duration-300 hover:-translate-y-1 hover:border-brand/40 hover:shadow-[0_16px_40px_-20px_rgba(232,93,36,0.6)] motion-reduce:hover:translate-y-0">
+    <div className="group surface-card relative overflow-hidden rounded-2xl p-5 transition-all duration-300 hover:-translate-y-1 hover:border-brand/40 hover:shadow-[0_16px_40px_-20px_var(--sombra-marca)] motion-reduce:hover:translate-y-0">
       {/* Brillo que asoma al pasar el mouse, para que la tarjeta responda */}
       <span
         aria-hidden="true"
@@ -143,7 +143,7 @@ export function Step({
 }) {
   return (
     <li className="relative pl-16">
-      <span className="brand-gradient absolute top-0 left-0 flex size-10 items-center justify-center rounded-xl font-heading text-base font-bold text-[#0a0a0a] shadow-[0_8px_24px_-10px_rgba(232,93,36,0.9)]">
+      <span className="brand-gradient absolute top-0 left-0 flex size-10 items-center justify-center rounded-xl font-heading text-base font-bold text-[#0a0a0a] shadow-[0_8px_24px_-10px_var(--sombra-marca)]">
         {number}
       </span>
       <h3 className="font-heading text-base font-semibold">{title}</h3>

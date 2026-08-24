@@ -1,3 +1,5 @@
+"use client";
+
 import { CLAVE_TEMA, COLOR_BARRA, VERSION_TEMA } from "@/lib/theme";
 
 /**
@@ -26,6 +28,10 @@ if(m)m.setAttribute("content",o?${JSON.stringify(COLOR_BARRA.oscuro)}:${JSON.str
  * En el cliente se emite como `text/plain` para que el navegador no lo vuelva
  * a ejecutar y para que React no avise por renderizar <script>. El desajuste
  * de `type` lo tapa `suppressHydrationWarning`.
+ *
+ * Es componente de cliente justamente por eso: uno de servidor solo puede
+ * emitir un `type`, y React protesta al hidratar el <script> que llega en la
+ * carga útil.
  */
 export function ThemeScript() {
   return (

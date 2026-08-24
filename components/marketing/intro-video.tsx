@@ -92,7 +92,7 @@ export function IntroVideo({ className }: { className?: string }) {
               aria-label="Reproducir el video introductorio"
               className="group absolute inset-0 flex items-center justify-center bg-background/25 transition-colors duration-300 hover:bg-background/10"
             >
-              <span className="brand-gradient flex size-16 items-center justify-center rounded-full text-primary-foreground shadow-[0_10px_40px_-8px_rgba(232,93,36,0.9)] transition-transform duration-300 group-hover:scale-110 motion-reduce:group-hover:scale-100">
+              <span className="brand-gradient flex size-16 items-center justify-center rounded-full text-primary-foreground shadow-[0_10px_40px_-8px_var(--sombra-marca)] transition-transform duration-300 group-hover:scale-110 motion-reduce:group-hover:scale-100">
                 <Play className="size-7 translate-x-0.5 fill-current" />
               </span>
             </button>

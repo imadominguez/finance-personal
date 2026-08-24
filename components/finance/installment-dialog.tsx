@@ -20,7 +20,7 @@ import {
 } from "@/components/ui/native-select";
 import { PAYMENT_METHODS } from "@/lib/constants";
 import { addMonthsToKey, currentMonthKey, formatMonthLong } from "@/lib/date";
-import { formatMoney, parseAmountInput } from "@/lib/format";
+import { formatoDeCuenta, formatMoney, parseAmountInput } from "@/lib/format";
 import type { InstallmentPlan, PaymentMethod } from "@/lib/types";
 
 interface InstallmentDialogProps {
@@ -200,7 +200,7 @@ function InstallmentForm({
               Quedan{" "}
               <span className="font-semibold text-brand tabular">
                 {count} ×{" "}
-                {formatMoney(perInstallment, state.settings, {
+                {formatMoney(perInstallment, formatoDeCuenta(state.settings), {
                   decimals: true,
                 })}
               </span>

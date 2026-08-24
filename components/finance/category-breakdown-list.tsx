@@ -7,11 +7,12 @@ import { Money } from "@/components/finance/money";
 import { ProgressBar } from "@/components/finance/progress-bar";
 import { formatPercent } from "@/lib/format";
 import { cn } from "@/lib/utils";
-import type { CategoryBreakdown, Settings } from "@/lib/types";
+import type { CategoryBreakdown, MoneyFormat } from "@/lib/types";
 
 interface CategoryBreakdownListProps {
   items: CategoryBreakdown[];
-  settings: Settings;
+  /** Cómo dibujar los montos. Sale de `moneyFormat`, no de `state.settings`. */
+  settings: MoneyFormat;
   /** Cuántas filas mostrar antes del botón "ver todas". */
   limit?: number;
   emptyMessage?: string;
