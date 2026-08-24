@@ -52,7 +52,7 @@ export function MainNav({ className }: { className?: string }) {
                 href={item.href}
                 aria-current={active ? "page" : undefined}
                 className={cn(
-                  "relative flex animate-fade-down items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm font-medium whitespace-nowrap transition-all duration-200",
+                  "relative flex h-11 animate-fade-down items-center gap-1.5 rounded-lg px-3 text-sm font-medium whitespace-nowrap transition-all duration-200 sm:h-8",
                   active
                     ? "bg-brand/12 text-brand"
                     : "text-muted-foreground hover:bg-surface-raised hover:text-foreground",

@@ -4,6 +4,8 @@ import * as React from "react";
 import { Check, Trash2 } from "lucide-react";
 
 import { CategoryIcon, resolveIcon } from "@/components/finance/category-icon";
+import { useCierreConCambios } from "@/components/finance/cierre-con-cambios";
+import { ConfirmarBorrado } from "@/components/finance/confirmar-borrado";
 import { useFinanceReady } from "@/components/providers/finance-provider";
 import { Button } from "@/components/ui/button";
 import {
@@ -32,16 +34,22 @@ export function CategoryDialog({
   category,
   defaultKind = "gasto",
 }: CategoryDialogProps) {
+  const { alCambiarApertura, propsDelFormulario, confirmacion } =
+    useCierreConCambios(onOpenChange);
+
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog open={open} onOpenChange={alCambiarApertura}>
       <DialogContent className="sm:max-w-md">
         <CategoryForm
           key={category?.id ?? `nuevo-${defaultKind}`}
+          propsDelFormulario={propsDelFormulario}
           category={category}
           defaultKind={defaultKind}
           onDone={() => onOpenChange(false)}
         />
       </DialogContent>
+
+      {confirmacion}
     </Dialog>
   );
 }
@@ -50,12 +58,29 @@ function CategoryForm({
   category,
   defaultKind,
   onDone,
+  propsDelFormulario,
 }: {
   category?: Category | null;
   defaultKind: MovementKind;
   onDone: () => void;
+  /** Detecta que se tocó algo, para no cerrar y perderlo. */
+  propsDelFormulario: React.ComponentProps<"form">;
 }) {
-  const { addCategory, updateCategory, removeCategory } = useFinanceReady();
+  const { state, addCategory, updateCategory, removeCategory } =
+    useFinanceReady();
+
+  /*
+   * Cuántos movimientos quedan huérfanos si se borra. La confirmación lo dice
+   * antes, no después: el principio es que se pueda anticipar el efecto.
+   */
+  const movimientosDeLaCategoria = React.useMemo(
+    () =>
+      category
+        ? state.transactions.filter((item) => item.categoryId === category.id)
+            .length
+        : 0,
+    [state.transactions, category],
+  );
 
   const [name, setName] = React.useState(category?.name ?? "");
   const [kind, setKind] = React.useState<MovementKind>(
@@ -68,6 +93,7 @@ function CategoryForm({
     category?.icon ?? CATEGORY_ICONS[0],
   );
   const [error, setError] = React.useState<string | null>(null);
+  const [confirmandoBorrado, setConfirmandoBorrado] = React.useState(false);
 
   function handleSubmit(event: React.FormEvent) {
     event.preventDefault();
@@ -96,7 +122,11 @@ function CategoryForm({
         </DialogDescription>
       </DialogHeader>
 
-      <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+      <form
+        {...propsDelFormulario}
+        onSubmit={handleSubmit}
+        className="flex flex-col gap-4"
+      >
         <div className="flex items-center gap-3 rounded-xl border border-hairline bg-surface-raised p-3">
           <CategoryIcon icon={icon} color={color} size="lg" />
           <div className="min-w-0">
@@ -204,10 +234,7 @@ function CategoryForm({
             <Button
               type="button"
               variant="destructive"
-              onClick={() => {
-                removeCategory(category.id);
-                onDone();
-              }}
+              onClick={() => setConfirmandoBorrado(true)}
             >
               <Trash2 />
               Borrar
@@ -227,6 +254,23 @@ function CategoryForm({
           </div>
         </div>
       </form>
+
+      {category ? (
+        <ConfirmarBorrado
+          abierto={confirmandoBorrado}
+          onOpenChange={setConfirmandoBorrado}
+          que={`la categoría "${category.name}"`}
+          consecuencia={
+            movimientosDeLaCategoria > 0
+              ? `Los ${movimientosDeLaCategoria} movimientos que tiene cargados van a quedar sin categoría.`
+              : undefined
+          }
+          onConfirmar={() => {
+            removeCategory(category.id);
+            onDone();
+          }}
+        />
+      ) : null}
     </>
   );
 }

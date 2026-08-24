@@ -3,6 +3,8 @@
 import * as React from "react";
 import { Check, Trash2 } from "lucide-react";
 
+import { useCierreConCambios } from "@/components/finance/cierre-con-cambios";
+import { ConfirmarBorrado } from "@/components/finance/confirmar-borrado";
 import { useFinanceReady } from "@/components/providers/finance-provider";
 import { Button } from "@/components/ui/button";
 import {
@@ -35,15 +37,21 @@ export function RecurringDialog({
   onOpenChange,
   rule,
 }: RecurringDialogProps) {
+  const { alCambiarApertura, propsDelFormulario, confirmacion } =
+    useCierreConCambios(onOpenChange);
+
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog open={open} onOpenChange={alCambiarApertura}>
       <DialogContent className="sm:max-w-md">
         <RecurringForm
           key={rule?.id ?? "nuevo"}
+          propsDelFormulario={propsDelFormulario}
           rule={rule}
           onDone={() => onOpenChange(false)}
         />
       </DialogContent>
+
+      {confirmacion}
     </Dialog>
   );
 }
@@ -51,9 +59,12 @@ export function RecurringDialog({
 function RecurringForm({
   rule,
   onDone,
+  propsDelFormulario,
 }: {
   rule?: RecurringRule | null;
   onDone: () => void;
+  /** Detecta que se tocó algo, para no cerrar y perderlo. */
+  propsDelFormulario: React.ComponentProps<"form">;
 }) {
   const { state, addRecurring, updateRecurring, removeRecurring } =
     useFinanceReady();
@@ -75,6 +86,7 @@ function RecurringForm({
   );
   const [endMonth, setEndMonth] = React.useState(rule?.endMonth ?? "");
   const [error, setError] = React.useState<string | null>(null);
+  const [confirmandoBorrado, setConfirmandoBorrado] = React.useState(false);
 
   const categories = state.categories.filter(
     (category) => category.kind === kind,
@@ -132,7 +144,11 @@ function RecurringForm({
         </DialogDescription>
       </DialogHeader>
 
-      <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+      <form
+        {...propsDelFormulario}
+        onSubmit={handleSubmit}
+        className="flex flex-col gap-4"
+      >
         <div className="grid grid-cols-2 gap-2 rounded-xl border border-hairline bg-surface-raised p-1">
           {(["gasto", "ingreso"] as const).map((option) => (
             <button
@@ -248,10 +264,7 @@ function RecurringForm({
             <Button
               type="button"
               variant="destructive"
-              onClick={() => {
-                removeRecurring(rule.id);
-                onDone();
-              }}
+              onClick={() => setConfirmandoBorrado(true)}
             >
               <Trash2 />
               Borrar
@@ -271,6 +284,21 @@ function RecurringForm({
           </div>
         </div>
       </form>
+
+      {rule ? (
+        <ConfirmarBorrado
+          abierto={confirmandoBorrado}
+          onOpenChange={setConfirmandoBorrado}
+          que={`el gasto fijo "${rule.description}"`}
+          consecuencia={
+            "Los movimientos que proyecta cada mes dejan de aparecer."
+          }
+          onConfirmar={() => {
+            removeRecurring(rule.id);
+            onDone();
+          }}
+        />
+      ) : null}
     </>
   );
 }

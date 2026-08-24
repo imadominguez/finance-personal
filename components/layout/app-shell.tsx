@@ -51,7 +51,7 @@ export function AppShell({
           <div className="flex h-14 items-center justify-between gap-3">
             <Link
               href="/hoy"
-              className="group flex items-center gap-2 transition-opacity hover:opacity-80"
+              className="group -mx-1 flex h-11 items-center gap-2 px-1 transition-opacity hover:opacity-80 sm:h-auto"
             >
               <span className="brand-gradient flex size-8 items-center justify-center rounded-lg text-primary-foreground shadow-[0_4px_16px_-6px_var(--sombra-marca)] transition-transform duration-300 group-hover:scale-105 motion-reduce:group-hover:scale-100">
                 <Wallet className="size-4" />

@@ -192,7 +192,7 @@ export function HoyView() {
         action={
           <Link
             href="/movimientos"
-            className="text-xs text-muted-foreground transition-colors hover:text-brand"
+            className="flex min-h-11 items-center rounded-lg px-2 text-xs text-muted-foreground transition-colors hover:bg-surface-raised hover:text-brand sm:min-h-6 sm:px-1 sm:hover:bg-transparent"
           >
             Ver todos
           </Link>

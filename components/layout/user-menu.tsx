@@ -52,7 +52,9 @@ export function UserMenu({ user }: UserMenuProps) {
       <DropdownMenuTrigger
         aria-label="Tu cuenta"
         className={cn(
-          "flex size-8 shrink-0 items-center justify-center overflow-hidden rounded-full border border-hairline bg-surface-raised text-xs font-semibold transition-all duration-200 outline-none",
+          "relative flex size-8 shrink-0 items-center justify-center overflow-hidden rounded-full border border-hairline bg-surface-raised text-xs font-semibold transition-all duration-200 outline-none",
+          // El avatar se ve de 32 px pero se toca en 44: el pulgar no apunta tan fino.
+          "after:absolute after:-inset-1.5 after:content-[''] sm:after:content-none",
           "hover:border-brand/50 hover:text-brand focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50",
           "aria-expanded:border-brand/60 aria-expanded:bg-brand/10 aria-expanded:text-brand",
         )}

@@ -1,10 +1,17 @@
 "use client";
 
 import * as React from "react";
-import { ListFilter, Search, X } from "lucide-react";
+import {
+  ChevronDown,
+  ListFilter,
+  Search,
+  SlidersHorizontal,
+  X,
+} from "lucide-react";
 
 import { EntryList } from "@/components/finance/entry-list";
 import { EmptyState } from "@/components/finance/empty-state";
+import { cn } from "@/lib/utils";
 import { Money } from "@/components/finance/money";
 import { SectionCard } from "@/components/finance/section-card";
 import { useFinanceReady } from "@/components/providers/finance-provider";
@@ -26,6 +33,13 @@ export function MovimientosView() {
   const { state, moneyFormat } = useFinanceReady();
 
   const [search, setSearch] = React.useState("");
+  /*
+   * En el teléfono los filtros arrancan cerrados: desplegados se comen la
+   * pantalla entera y hay que scrollear un rato antes de ver un movimiento,
+   * que es justo lo que se vino a ver. De `sm:` para arriba hay lugar de
+   * sobra y se muestran siempre.
+   */
+  const [filtrosAbiertos, setFiltrosAbiertos] = React.useState(false);
   const [kind, setKind] = React.useState<KindFilter>("todos");
   const [categoryId, setCategoryId] = React.useState("todas");
   const [from, setFrom] = React.useState(`${currentYear()}-01-01`);
@@ -65,6 +79,10 @@ export function MovimientosView() {
   const hasFilters =
     search !== "" || kind !== "todos" || categoryId !== "todas";
 
+  /** Solo los del panel: la búsqueda se ve siempre, no hace falta contarla. */
+  const filtrosPuestos =
+    (kind !== "todos" ? 1 : 0) + (categoryId !== "todas" ? 1 : 0);
+
   function resetFilters() {
     setSearch("");
     setKind("todos");
@@ -92,7 +110,7 @@ export function MovimientosView() {
               value={search}
               onChange={(event) => setSearch(event.target.value)}
               placeholder="Buscar por descripción…"
-              className="h-9 pl-8"
+              className="pl-8 sm:h-9"
               aria-label="Buscar movimientos"
             />
             {search ? (
@@ -100,14 +118,44 @@ export function MovimientosView() {
                 type="button"
                 onClick={() => setSearch("")}
                 aria-label="Limpiar búsqueda"
-                className="absolute top-1/2 right-2 -translate-y-1/2 rounded-md p-1 text-muted-foreground transition-colors hover:text-foreground"
+                className="absolute top-1/2 right-1 -translate-y-1/2 flex size-11 items-center justify-center rounded-md text-muted-foreground transition-colors hover:text-foreground sm:right-2 sm:size-7"
               >
                 <X className="size-3.5" />
               </button>
             ) : null}
           </div>
 
-          <div className="grid gap-3 sm:grid-cols-2">
+          <button
+            type="button"
+            onClick={() => setFiltrosAbiertos((abierto) => !abierto)}
+            aria-expanded={filtrosAbiertos}
+            aria-controls="filtros-avanzados"
+            className="flex min-h-11 items-center justify-between gap-2 rounded-lg border border-hairline bg-surface-raised px-3 text-sm font-medium transition-colors hover:text-brand sm:hidden"
+          >
+            <span className="flex items-center gap-2">
+              <SlidersHorizontal className="size-4" />
+              Filtros
+              {filtrosPuestos > 0 ? (
+                <span className="rounded-full bg-brand/15 px-2 py-0.5 text-xs text-brand">
+                  {filtrosPuestos}
+                </span>
+              ) : null}
+            </span>
+            <ChevronDown
+              className={cn(
+                "size-4 transition-transform duration-200",
+                filtrosAbiertos && "rotate-180",
+              )}
+            />
+          </button>
+
+          <div
+            id="filtros-avanzados"
+            className={cn(
+              "grid gap-3 sm:grid-cols-2",
+              !filtrosAbiertos && "hidden sm:grid",
+            )}
+          >
             <div className="flex flex-col gap-1.5">
               <Label htmlFor="kind">Tipo</Label>
               <NativeSelect

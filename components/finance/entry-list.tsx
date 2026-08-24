@@ -170,10 +170,18 @@ function EntryRow({
       <CategoryIcon icon={categoryIcon} color={categoryColor} />
 
       <div className="min-w-0 flex-1">
-        <div className="flex items-center gap-2">
-          <span className="truncate text-sm font-medium text-foreground/90">
-            {entry.description}
-          </span>
+        {/*
+          En el teléfono la descripción se lleva el renglón entero: es lo que
+          identifica al movimiento, y compartiéndolo con los badges quedaba
+          cortada en tres letras. Los badges bajan al segundo renglón, al lado
+          de la categoría. De `sm:` para arriba entra todo junto.
+        */}
+        <span className="block truncate text-sm font-medium text-foreground/90 sm:inline">
+          {entry.description}
+        </span>
+
+        <div className="mt-0.5 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-muted-foreground">
+          <span className="truncate">{categoryName}</span>
           {entry.origin === "fijo" ? (
             <OriginBadge icon={Repeat} label="Fijo" />
           ) : null}
@@ -184,9 +192,6 @@ function EntryRow({
             <OriginBadge icon={CalendarClock} label="Proyectado" tone="muted" />
           ) : null}
         </div>
-        <p className="mt-0.5 truncate text-xs text-muted-foreground">
-          {categoryName}
-        </p>
       </div>
 
       <Money
