@@ -18,6 +18,7 @@ import { DolarSettings } from "@/components/finance/dolar-settings";
 import { SectionCard } from "@/components/finance/section-card";
 import { InstallButton } from "@/components/pwa/install-button";
 import { ThemeSettings } from "@/components/theme/theme-settings";
+import { TarjetaWhatsapp } from "@/components/whatsapp/tarjeta-whatsapp";
 import { useFinanceReady } from "@/components/providers/finance-provider";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -35,11 +36,12 @@ import {
 } from "@/lib/storage";
 
 interface AjustesViewProps {
-  user: { email: string; name: string } | null;
+  user: { email: string; name: string; phone: string | null } | null;
+  numeroDelBot: string | null;
 }
 
 /** Preferencias, respaldo de datos y cuenta. */
-export function AjustesView({ user }: AjustesViewProps) {
+export function AjustesView({ user, numeroDelBot }: AjustesViewProps) {
   const {
     state,
     updateSettings,
@@ -177,6 +179,17 @@ export function AjustesView({ user }: AjustesViewProps) {
         delay={80}
       >
         <ThemeSettings />
+      </SectionCard>
+
+      <SectionCard
+        title="Cargar gastos por WhatsApp"
+        description="Escribile al bot y queda anotado, sin abrir la app"
+        delay={90}
+      >
+        <TarjetaWhatsapp
+          telefono={user?.phone ?? null}
+          numeroDelBot={numeroDelBot}
+        />
       </SectionCard>
 
       <SectionCard

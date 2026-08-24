@@ -18,6 +18,8 @@ export interface CurrentUser {
   name: string;
   /** Foto de perfil de Google, si la cuenta tiene. */
   image: string | null;
+  /** Teléfono vinculado por WhatsApp, en E.164. `null` = sin conectar. */
+  phone: string | null;
 }
 
 /**
@@ -75,6 +77,12 @@ export const getCurrentUser = cache(async (): Promise<CurrentUser | null> => {
 
   return prisma.user.findUnique({
     where: { id: session.userId },
-    select: { id: true, email: true, name: true, image: true },
+    select: {
+      id: true,
+      email: true,
+      name: true,
+      image: true,
+      phone: true,
+    },
   });
 });

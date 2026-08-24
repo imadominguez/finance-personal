@@ -118,6 +118,55 @@ El `matcher` del proxy excluye el manifiesto, el service worker y los íconos: s
 los redirigiera al login, el navegador recibiría HTML donde espera JSON y la app dejaría de
 ser instalable.
 
+## Cargar gastos por WhatsApp
+
+Se le manda un mensaje al bot —«gasté $20000 en supermercado»— y el movimiento
+queda cargado. Es opcional: sin las variables de entorno el módulo está apagado
+y la app funciona igual.
+
+**Son dos piezas.** La app expone `POST /api/whatsapp/entrante`; el bot
+([`bot/`](bot/), con [open-wa](https://www.open-wa.org/)) recibe el mensaje, se
+lo reenvía y contesta lo que la app le diga. El bot **no corre en Vercel**:
+maneja una sesión de WhatsApp Web con un Chromium y necesita un proceso
+prendido, así que va en Railway, Fly o un VPS.
+
+Está partido así a propósito: toda la lógica —interpretar el texto, vincular el
+número, guardar el movimiento— vive en `lib/whatsapp/` con sus tests, y el bot
+es una pieza tonta y reemplazable. Si el número se cae o mañana se migra a la
+API oficial de Meta, se cambia `bot/` y nada más.
+
+### Cómo se conecta un teléfono
+
+El código va **de la app al WhatsApp**, nunca al revés: en Ajustes se genera un
+código de un solo uso y se manda **desde** el teléfono. Escribir un número en un
+formulario no probaría nada; mandar desde ese teléfono un código que solo se ve
+con la sesión iniciada, sí. Un número pertenece a una sola cuenta.
+
+### Qué entiende
+
+| Se escribe                     | Se carga                              |
+| ------------------------------ | ------------------------------------- |
+| `gasté $20000 en supermercado` | gasto de $20.000 en Supermercado      |
+| `20 lucas nafta`               | gasto de $20.000 en Transporte        |
+| `café 1200`                    | gasto de $1.200 en Delivery y salidas |
+| `cobré 500 lucas de sueldo`    | **ingreso** de $500.000 en Sueldo     |
+| `BORRAR`                       | deshace lo último                     |
+
+El parser (`lib/whatsapp/parser.ts`) es puro y está cubierto por tests: `pnpm
+test`. Si no entiende, repregunta y no inventa nada.
+
+### Cuidar el número
+
+open-wa no es oficial y el número puede terminar baneado. El módulo está escrito
+para reducir el riesgo: nunca manda un mensaje que nadie pidió, contesta como
+mucho una vez por mensaje, ignora grupos, y corta en 30 mensajes por hora por
+número. A un número desconocido le explica una vez y después se calla.
+
+`POST /api/whatsapp/entrante` es la superficie más peligrosa de la app: crea
+movimientos sin cookie de sesión. Está protegida con un secreto compartido
+comparado en tiempo constante, validación de todo lo que entra, e idempotencia
+por id de mensaje.
+
 ## Cuentas y datos
 
 Se entra **solo con Google**. No hay contraseñas: ingresar y registrarse son lo mismo, y si

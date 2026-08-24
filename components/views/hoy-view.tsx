@@ -165,7 +165,10 @@ export function HoyView() {
             budget.hasBudget ? (
               "Con lo que queda del mes"
             ) : (
-              <Link href="/ajustes" className="text-brand hover:underline">
+              <Link
+                href="/ajustes"
+                className="inline-flex min-h-11 items-center text-brand hover:underline sm:min-h-6"
+              >
                 Definí tu presupuesto
               </Link>
             )
