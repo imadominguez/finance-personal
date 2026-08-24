@@ -301,6 +301,12 @@ lib/
 
 ## Decisiones que vale la pena conocer
 
+- **Mobile primero, sin excepción.** Se diseña y se prueba a 360 px y el
+  escritorio es la ampliación: en Tailwind eso significa clases base para el
+  teléfono y `sm:`/`md:` para agrandar. Los controles miden 44 px con el dedo y
+  vuelven a su tamaño compacto con mouse (`h-11 sm:h-8`). El criterio completo
+  está en [`docs/ux/`](docs/ux/), y se verifica con
+  `node .claude/skills/ux-auditoria/scripts/auditar.mjs`.
 - **El dólar es una forma de mirar, no una conversión de los datos.** Los montos se
   guardan siempre en la moneda de la cuenta; elegir "ver en dólar blue" solo cambia el
   formato al dibujar (`lib/format.ts`), así que volver a pesos no pierde nada y la

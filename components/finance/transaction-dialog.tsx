@@ -4,6 +4,8 @@ import * as React from "react";
 import { Check, Trash2 } from "lucide-react";
 
 import { CategoryIcon } from "@/components/finance/category-icon";
+import { useCierreConCambios } from "@/components/finance/cierre-con-cambios";
+import { ConfirmarBorrado } from "@/components/finance/confirmar-borrado";
 import { useFinanceReady } from "@/components/providers/finance-provider";
 import { Button } from "@/components/ui/button";
 import {
@@ -55,22 +57,30 @@ export function TransactionDialog({
   defaultKind = "gasto",
   defaultDate,
 }: TransactionDialogProps) {
+  const { alCambiarApertura, propsDelFormulario, confirmacion } =
+    useCierreConCambios(onOpenChange);
+
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog open={open} onOpenChange={alCambiarApertura}>
       <DialogContent className="sm:max-w-md">
         <TransactionForm
           key={transaction?.id ?? "nuevo"}
+          propsDelFormulario={propsDelFormulario}
           onDone={() => onOpenChange(false)}
           transaction={transaction}
           defaultKind={defaultKind}
           defaultDate={defaultDate}
         />
       </DialogContent>
+
+      {confirmacion}
     </Dialog>
   );
 }
 
 interface TransactionFormProps {
+  /** Detecta que se tocó algo, para no cerrar y perderlo. */
+  propsDelFormulario: React.ComponentProps<"form">;
   onDone: () => void;
   transaction?: Transaction | null;
   defaultKind: MovementKind;
@@ -79,6 +89,7 @@ interface TransactionFormProps {
 
 function TransactionForm({
   onDone,
+  propsDelFormulario,
   transaction,
   defaultKind,
   defaultDate,
@@ -122,10 +133,25 @@ function TransactionForm({
     };
   });
   const [error, setError] = React.useState<string | null>(null);
+  const [confirmandoBorrado, setConfirmandoBorrado] = React.useState(false);
+  /*
+   * Validación en el momento, no al enviar. El mensaje aparece recién después
+   * de que la persona tocó el campo y salió: avisar "el monto tiene que ser
+   * mayor a cero" cuando todavía no escribió nada sería regañarla de entrada.
+   */
+  const [montoTocado, setMontoTocado] = React.useState(false);
 
   const categories = categoriesFor(form.kind);
   const parsedAmount = parseAmountInput(form.amount);
   const isEditing = Boolean(transaction);
+
+  const montoValido = Number.isFinite(parsedAmount) && parsedAmount > 0;
+  const errorDelMonto =
+    montoTocado && !montoValido
+      ? form.amount.trim() === ""
+        ? "Escribí cuánto fue."
+        : "El monto tiene que ser mayor a cero."
+      : null;
 
   function setKind(kind: MovementKind) {
     setForm((current) => ({
@@ -139,12 +165,18 @@ function TransactionForm({
   function handleSubmit(event: React.FormEvent) {
     event.preventDefault();
 
-    if (!Number.isFinite(parsedAmount) || parsedAmount <= 0) {
-      setError("Ingresá un monto mayor a cero.");
+    if (!montoValido) {
+      // Marca el campo y lo enfoca: el error se lee al lado de lo que falta.
+      setMontoTocado(true);
+      document.getElementById("amount")?.focus();
       return;
     }
     if (!form.categoryId) {
-      setError("Elegí una categoría.");
+      setError(
+        categories.length === 0
+          ? `Primero creá una categoría de ${form.kind === "gasto" ? "gastos" : "ingresos"}.`
+          : "Elegí una categoría.",
+      );
       return;
     }
 
@@ -174,6 +206,13 @@ function TransactionForm({
     onDone();
   }
 
+  /** Lo que se va a borrar, dicho con el dato adentro y no como "el ítem". */
+  const descripcionDelBorrado = transaction
+    ? `este movimiento de ${formatMoney(transaction.amount, formatoDeCuenta(state.settings))}${
+        transaction.description ? ` (${transaction.description})` : ""
+      }`
+    : "";
+
   return (
     <>
       <DialogHeader>
@@ -187,7 +226,11 @@ function TransactionForm({
         </DialogDescription>
       </DialogHeader>
 
-      <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+      <form
+        {...propsDelFormulario}
+        onSubmit={handleSubmit}
+        className="flex flex-col gap-4"
+      >
         {/* Tipo */}
         <div className="grid grid-cols-2 gap-2 rounded-xl border border-hairline bg-surface-raised p-1">
           {(["gasto", "ingreso"] as const).map((kind) => (
@@ -222,27 +265,38 @@ function TransactionForm({
             onChange={(event) =>
               setForm((current) => ({ ...current, amount: event.target.value }))
             }
-            className="h-12 text-2xl font-bold tabular"
+            onBlur={() => setMontoTocado(true)}
+            aria-invalid={errorDelMonto !== null}
+            aria-describedby="amount-ayuda"
+            className="h-12 text-2xl font-bold tabular sm:h-12"
           />
-          <p className="h-4 text-xs text-muted-foreground">
-            {Number.isFinite(parsedAmount) && parsedAmount > 0 ? (
-              <>
-                {formatMoney(parsedAmount, formatoDeCuenta(state.settings), {
-                  decimals: true,
-                })}
-                {/*
+          <p
+            id="amount-ayuda"
+            aria-live="polite"
+            className={cn(
+              "min-h-4 text-xs",
+              errorDelMonto ? "text-destructive" : "text-muted-foreground",
+            )}
+          >
+            {errorDelMonto ??
+              (Number.isFinite(parsedAmount) && parsedAmount > 0 ? (
+                <>
+                  {formatMoney(parsedAmount, formatoDeCuenta(state.settings), {
+                    decimals: true,
+                  })}
+                  {/*
                   El campo va siempre en la moneda de la cuenta, aunque se esté
                   mirando todo en dólares: acá se agrega el equivalente para no
                   tener que hacer la cuenta de cabeza.
                 */}
-                {moneyFormat.usdRate ? (
-                  <span className="text-brand">
-                    {" ≈ "}
-                    {formatMoney(parsedAmount, moneyFormat)}
-                  </span>
-                ) : null}
-              </>
-            ) : null}
+                  {moneyFormat.usdRate ? (
+                    <span className="text-brand">
+                      {" ≈ "}
+                      {formatMoney(parsedAmount, moneyFormat)}
+                    </span>
+                  ) : null}
+                </>
+              ) : null)}
           </p>
         </div>
 
@@ -262,7 +316,7 @@ function TransactionForm({
                 }
                 aria-pressed={form.categoryId === category.id}
                 className={cn(
-                  "flex items-center gap-2 rounded-lg border px-2 py-1.5 text-left text-xs transition-all duration-200",
+                  "flex min-h-11 items-center gap-2 rounded-lg border px-2 py-1.5 text-left text-xs transition-all duration-200 sm:min-h-0",
                   form.categoryId === category.id
                     ? "border-brand/60 bg-brand/10 text-foreground"
                     : "border-hairline bg-surface-raised text-muted-foreground hover:border-border hover:text-foreground",
@@ -277,6 +331,14 @@ function TransactionForm({
                 <span className="truncate">{category.name}</span>
               </button>
             ))}
+
+            {categories.length === 0 ? (
+              <p className="col-span-full rounded-lg border border-dashed border-hairline px-3 py-4 text-center text-xs text-muted-foreground">
+                No tenés categorías de{" "}
+                {form.kind === "gasto" ? "gastos" : "ingresos"} todavía. Creá
+                una desde <span className="text-foreground">Categorías</span>.
+              </p>
+            ) : null}
           </div>
         </div>
 
@@ -339,7 +401,11 @@ function TransactionForm({
 
         <div className="flex items-center justify-between gap-2 sticky bottom-0 -mx-4 -mb-4 mt-1 border-t border-hairline bg-popover/95 px-4 py-3 backdrop-blur sm:-mb-4">
           {isEditing ? (
-            <Button type="button" variant="destructive" onClick={handleDelete}>
+            <Button
+              type="button"
+              variant="destructive"
+              onClick={() => setConfirmandoBorrado(true)}
+            >
               <Trash2 />
               Borrar
             </Button>
@@ -358,6 +424,13 @@ function TransactionForm({
           </div>
         </div>
       </form>
+
+      <ConfirmarBorrado
+        abierto={confirmandoBorrado}
+        onOpenChange={setConfirmandoBorrado}
+        que={descripcionDelBorrado}
+        onConfirmar={handleDelete}
+      />
     </>
   );
 }

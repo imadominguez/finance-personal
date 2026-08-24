@@ -102,7 +102,7 @@ export function CategoryBreakdownList({
         <button
           type="button"
           onClick={() => setExpanded(true)}
-          className="mt-3 self-center rounded-lg px-3 py-1.5 text-xs font-medium text-muted-foreground transition-colors hover:bg-surface-raised hover:text-brand"
+          className="mt-3 flex min-h-11 items-center self-center rounded-lg px-3 py-1.5 text-xs font-medium text-muted-foreground transition-colors hover:bg-surface-raised hover:text-brand sm:min-h-0"
         >
           Ver {hidden} categoría{hidden === 1 ? "" : "s"} más
         </button>
