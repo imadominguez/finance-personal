@@ -145,7 +145,7 @@ function RecurringForm({
                 kind === option
                   ? option === "gasto"
                     ? "bg-brand text-primary-foreground"
-                    : "bg-success text-[#0a0a0a]"
+                    : "bg-success text-success-foreground"
                   : "text-muted-foreground hover:text-foreground",
               )}
             >

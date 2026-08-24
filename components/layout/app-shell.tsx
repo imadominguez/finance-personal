@@ -8,6 +8,7 @@ import { MainNav } from "@/components/layout/main-nav";
 import { UserMenu } from "@/components/layout/user-menu";
 import { TransactionDialog } from "@/components/finance/transaction-dialog";
 import { ErrorToast } from "@/components/layout/error-toast";
+import { ThemeToggle } from "@/components/theme/theme-toggle";
 import { Button } from "@/components/ui/button";
 import { APP_NAME } from "@/lib/constants";
 
@@ -51,7 +52,7 @@ export function AppShell({
               href="/hoy"
               className="group flex items-center gap-2 transition-opacity hover:opacity-80"
             >
-              <span className="brand-gradient flex size-8 items-center justify-center rounded-lg text-[#0a0a0a] shadow-[0_4px_16px_-6px_rgba(232,93,36,0.9)] transition-transform duration-300 group-hover:scale-105 motion-reduce:group-hover:scale-100">
+              <span className="brand-gradient flex size-8 items-center justify-center rounded-lg text-primary-foreground shadow-[0_4px_16px_-6px_var(--sombra-marca)] transition-transform duration-300 group-hover:scale-105 motion-reduce:group-hover:scale-100">
                 <Wallet className="size-4" />
               </span>
               <span className="font-heading text-sm font-semibold tracking-tight">
@@ -69,6 +70,7 @@ export function AppShell({
                 <span className="hidden sm:inline">Nuevo movimiento</span>
                 <span className="sm:hidden">Nuevo</span>
               </Button>
+              <ThemeToggle className="hidden sm:inline-flex" />
               <UserMenu user={user} />
             </div>
           </div>
@@ -97,7 +99,7 @@ export function AppShell({
         size="icon-lg"
         aria-label="Nuevo movimiento"
         onClick={() => setCreating(true)}
-        className="fixed right-[calc(1.25rem+var(--safe-right))] bottom-[calc(1.25rem+var(--safe-bottom))] z-40 size-14 rounded-full shadow-[0_10px_30px_-8px_rgba(232,93,36,0.9)] transition-transform duration-200 hover:scale-105 active:scale-95 motion-reduce:hover:scale-100 sm:hidden [&_svg:not([class*='size-'])]:size-6"
+        className="fixed right-[calc(1.25rem+var(--safe-right))] bottom-[calc(1.25rem+var(--safe-bottom))] z-40 size-14 rounded-full shadow-[0_10px_30px_-8px_var(--sombra-marca)] transition-transform duration-200 hover:scale-105 active:scale-95 motion-reduce:hover:scale-100 sm:hidden [&_svg:not([class*='size-'])]:size-6"
       >
         <Plus />
       </Button>

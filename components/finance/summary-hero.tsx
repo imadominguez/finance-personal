@@ -45,7 +45,7 @@ export function SummaryHero({
   return (
     <section
       className={cn(
-        "surface-card relative animate-fade-up overflow-hidden rounded-2xl p-6 shadow-[0_4px_20px_-8px_rgba(0,0,0,0.6)]",
+        "surface-card relative animate-fade-up overflow-hidden rounded-2xl p-6 shadow-(--sombra-card)",
         className,
       )}
     >

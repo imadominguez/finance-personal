@@ -16,6 +16,7 @@ import {
 import { deleteAccountAction, logoutAction } from "@/app/actions/auth";
 import { SectionCard } from "@/components/finance/section-card";
 import { InstallButton } from "@/components/pwa/install-button";
+import { ThemeSettings } from "@/components/theme/theme-settings";
 import { useFinanceReady } from "@/components/providers/finance-provider";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -118,7 +119,7 @@ export function AjustesView({ user }: AjustesViewProps) {
           Ajustes
         </h1>
         <p className="mt-1 text-sm text-muted-foreground">
-          Tu presupuesto, la moneda, tus datos y tu cuenta.
+          Tu presupuesto, la moneda, cómo se ve la app y tu cuenta.
         </p>
       </header>
 
@@ -167,6 +168,14 @@ export function AjustesView({ user }: AjustesViewProps) {
             {saved ? "Guardado" : "Guardar cambios"}
           </Button>
         </form>
+      </SectionCard>
+
+      <SectionCard
+        title="Apariencia"
+        description="El modo, el color y los bordes de la app. Se aplica al instante."
+        delay={80}
+      >
+        <ThemeSettings />
       </SectionCard>
 
       <SectionCard

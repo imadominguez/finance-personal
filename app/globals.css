@@ -48,6 +48,7 @@
   --color-surface-raised: var(--surface-raised);
   --color-hairline: var(--hairline);
   --color-success: var(--success);
+  --color-success-foreground: var(--success-foreground);
   --color-warning: var(--warning);
   --color-info: var(--info);
 
@@ -199,13 +200,23 @@
   }
 }
 
+/* -------------------------------------------------------------------------- */
+/* Paleta                                                                     */
+/* -------------------------------------------------------------------------- */
+
 /*
- * Paleta única (dark-first) definida en DESIGN.md.
- * :root y .dark comparten valores: la app es dark por diseño, pero mantener la
- * clase .dark en <html> hace que las variantes dark: de shadcn sigan aplicando.
+ * Dos modos, un solo color configurable.
+ *
+ * El acento entra por `--brand` (lo pisa en línea sobre <html> el script de
+ * `components/theme`), y de ahí sale todo lo demás con `color-mix`. Por eso
+ * cambiar de acento no requiere tocar este archivo: `--primary`, `--ring`, la
+ * barra lateral y los colores de gráficos ya lo siguen.
+ *
+ * `:root` es el modo claro y `.dark` el oscuro. Mismo peso de selector, así que
+ * el orden importa: `.dark` va después.
  */
-:root,
-.dark {
+
+:root {
   /*
    * Zonas seguras del dispositivo.
    *
@@ -220,6 +231,83 @@
   --safe-left: env(safe-area-inset-left, 0px);
   --safe-right: env(safe-area-inset-right, 0px);
 
+  color-scheme: light;
+
+  --background: #faf9f7;
+  --foreground: #14120f;
+
+  --surface: #ffffff;
+  --surface-raised: #f4f2ef;
+  --hairline: #e8e4de;
+
+  --card: #ffffff;
+  --card-foreground: #14120f;
+  --popover: #ffffff;
+  --popover-foreground: #14120f;
+
+  --brand: #c2410c;
+  --primary-foreground: #ffffff;
+
+  --secondary: #f1eeea;
+  --secondary-foreground: #33302b;
+  --muted: #f1eeea;
+  --muted-foreground: #6b6459;
+  --accent: #f1eeea;
+  --accent-foreground: #14120f;
+
+  --destructive: #dc2626;
+  --success: #047857;
+  --success-foreground: #ffffff;
+  --warning: #b45309;
+  --info: #1d4ed8;
+
+  --border: #e8e4de;
+  --input: #d9d3ca;
+
+  --radius: 0.75rem;
+
+  --sidebar: #ffffff;
+  --sidebar-foreground: #33302b;
+  --sidebar-accent: #f1eeea;
+  --sidebar-accent-foreground: #14120f;
+  --sidebar-border: #e8e4de;
+
+  /*
+   * En claro el degradado va hacia el negro, no hacia el blanco: es lo único
+   * que garantiza que el texto encima del degradado no pierda contraste sea
+   * cual sea el acento elegido.
+   */
+  --brand-light: color-mix(in oklab, var(--brand), black 8%);
+  --brand-dark: color-mix(in oklab, var(--brand), black 26%);
+
+  /* Misma idea para la rampa de gráficos: cada paso, más oscuro que el anterior. */
+  --chart-2: color-mix(in oklab, var(--brand), black 12%);
+  --chart-3: color-mix(in oklab, var(--brand), black 24%);
+  --chart-4: color-mix(in oklab, var(--brand), black 36%);
+  --chart-5: color-mix(in oklab, var(--brand), black 48%);
+
+  --velo-marca: color-mix(in oklab, var(--brand) 7%, transparent);
+  --sombra-marca: color-mix(in oklab, var(--brand) 45%, transparent);
+  --sombra-exito: color-mix(in oklab, var(--success) 40%, transparent);
+  --sombra-card:
+    0 1px 2px color-mix(in oklab, #14120f 6%, transparent),
+    0 10px 26px -14px color-mix(in oklab, #14120f 30%, transparent);
+  --shimmer-medio: #e8e4de;
+  --seleccion-fondo: color-mix(in oklab, var(--brand) 26%, transparent);
+  --seleccion-texto: #14120f;
+
+  /*
+   * iOS pinta el texto de la barra de estado en blanco cuando la app instalada
+   * usa `black-translucent`, y eso no se puede cambiar en caliente. En modo
+   * claro se pinta la franja de atrás para que ese blanco se siga leyendo.
+   * Donde no hay muesca, `--safe-top` es 0 y la franja no ocupa nada.
+   */
+  --franja-estado: #14120f;
+}
+
+.dark {
+  color-scheme: dark;
+
   --background: #0a0a0a;
   --foreground: #ffffff;
 
@@ -232,11 +320,8 @@
   --popover: #141414;
   --popover-foreground: #ffffff;
 
-  --primary: #e85d24;
-  --primary-foreground: #0a0a0a;
   --brand: #e85d24;
-  --brand-light: #ff6b35;
-  --brand-dark: #d64820;
+  --primary-foreground: #0a0a0a;
 
   --secondary: #1a1a1a;
   --secondary-foreground: #e8e8e8;
@@ -247,29 +332,52 @@
 
   --destructive: #ef4444;
   --success: #10b981;
+  --success-foreground: #0a0a0a;
   --warning: #f59e0b;
   --info: #3b82f6;
 
   --border: #2a2a2a;
   --input: #2a2a2a;
-  --ring: #e85d24;
-
-  --chart-1: #e85d24;
-  --chart-2: #ff8c42;
-  --chart-3: #d97634;
-  --chart-4: #c45628;
-  --chart-5: #f0a070;
-
-  --radius: 0.75rem;
 
   --sidebar: #121212;
   --sidebar-foreground: #e8e8e8;
-  --sidebar-primary: #e85d24;
-  --sidebar-primary-foreground: #0a0a0a;
   --sidebar-accent: #1a1a1a;
   --sidebar-accent-foreground: #ffffff;
   --sidebar-border: #2a2a2a;
-  --sidebar-ring: #e85d24;
+
+  --brand-light: color-mix(in oklab, var(--brand), white 20%);
+  --brand-dark: color-mix(in oklab, var(--brand), black 16%);
+
+  --chart-2: color-mix(in oklab, var(--brand), white 16%);
+  --chart-3: color-mix(in oklab, var(--brand), white 32%);
+  --chart-4: color-mix(in oklab, var(--brand), white 48%);
+  --chart-5: color-mix(in oklab, var(--brand), white 64%);
+
+  --velo-marca: color-mix(in oklab, var(--brand) 12%, transparent);
+  --sombra-marca: color-mix(in oklab, var(--brand) 90%, transparent);
+  --sombra-exito: color-mix(in oklab, var(--success) 90%, transparent);
+  --sombra-card: 0 4px 20px -8px color-mix(in oklab, black 60%, transparent);
+  --shimmer-medio: #232323;
+  --seleccion-fondo: color-mix(in oklab, var(--brand) 45%, transparent);
+  --seleccion-texto: #ffffff;
+
+  --franja-estado: transparent;
+}
+
+/*
+ * Derivados del acento. Viven fuera de los bloques de modo porque la fórmula
+ * es la misma en los dos: lo que cambia es `--brand`, y `var()` se resuelve
+ * con el valor que haya ganado en <html>.
+ */
+:root {
+  --primary: var(--brand);
+  --ring: var(--brand);
+
+  --chart-1: var(--brand);
+
+  --sidebar-primary: var(--brand);
+  --sidebar-primary-foreground: var(--primary-foreground);
+  --sidebar-ring: var(--brand);
 }
 
 @layer base {
@@ -279,14 +387,13 @@
 
   html {
     @apply font-sans;
-    color-scheme: dark;
   }
 
   body {
     @apply bg-background text-foreground;
     background-image: radial-gradient(
       110% 70% at 50% -10%,
-      color-mix(in oklch, var(--brand) 12%, transparent) 0%,
+      var(--velo-marca) 0%,
       transparent 60%
     );
     background-attachment: fixed;
@@ -298,8 +405,8 @@
   }
 
   ::selection {
-    background: color-mix(in oklch, var(--brand) 45%, transparent);
-    color: #fff;
+    background: var(--seleccion-fondo);
+    color: var(--seleccion-texto);
   }
 }
 
@@ -334,7 +441,7 @@
     background-image: linear-gradient(
       90deg,
       var(--surface-raised) 0%,
-      #232323 50%,
+      var(--shimmer-medio) 50%,
       var(--surface-raised) 100%
     );
     background-size: 200% 100%;
@@ -346,6 +453,21 @@
 
   .no-scrollbar::-webkit-scrollbar {
     display: none;
+  }
+}
+
+/*
+ * El cambio de tema no debe verse como un parpadeo. Se anima solo el color de
+ * fondo y el del texto de las superficies grandes, y nunca si pediste menos
+ * movimiento.
+ */
+@media (prefers-reduced-motion: no-preference) {
+  body,
+  .surface-card {
+    transition:
+      background-color 0.25s ease,
+      border-color 0.25s ease,
+      color 0.25s ease;
   }
 }
 

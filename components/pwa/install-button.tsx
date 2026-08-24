@@ -144,7 +144,7 @@ function Pasos({ plataforma }: { plataforma: Plataforma }) {
     <ol className="flex flex-col gap-3">
       {pasos.map((paso, index) => (
         <li key={index} className="flex gap-3">
-          <span className="brand-gradient flex size-6 shrink-0 items-center justify-center rounded-md text-xs font-bold text-[#0a0a0a]">
+          <span className="brand-gradient flex size-6 shrink-0 items-center justify-center rounded-md text-xs font-bold text-primary-foreground">
             {index + 1}
           </span>
           <span className="text-sm leading-relaxed text-muted-foreground">

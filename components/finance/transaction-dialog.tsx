@@ -195,8 +195,8 @@ function TransactionForm({
                 "rounded-lg px-3 py-2 text-sm font-medium capitalize transition-all duration-200",
                 form.kind === kind
                   ? kind === "gasto"
-                    ? "bg-brand text-primary-foreground shadow-[0_4px_14px_-6px_rgba(232,93,36,0.9)]"
-                    : "bg-success text-[#0a0a0a] shadow-[0_4px_14px_-6px_rgba(16,185,129,0.9)]"
+                    ? "bg-brand text-primary-foreground shadow-[0_4px_14px_-6px_var(--sombra-marca)]"
+                    : "bg-success text-success-foreground shadow-[0_4px_14px_-6px_var(--sombra-exito)]"
                   : "text-muted-foreground hover:text-foreground",
               )}
             >

@@ -11,7 +11,7 @@ export default function AuthLayout({ children }: LayoutProps<"/">) {
         href="/"
         className="group mb-6 flex animate-fade-down items-center gap-2.5 transition-opacity hover:opacity-80"
       >
-        <span className="brand-gradient flex size-10 items-center justify-center rounded-xl text-[#0a0a0a] shadow-[0_6px_20px_-6px_rgba(232,93,36,0.9)] transition-transform duration-300 group-hover:scale-105 motion-reduce:group-hover:scale-100">
+        <span className="brand-gradient flex size-10 items-center justify-center rounded-xl text-primary-foreground shadow-[0_6px_20px_-6px_var(--sombra-marca)] transition-transform duration-300 group-hover:scale-105 motion-reduce:group-hover:scale-100">
           <Wallet className="size-5" />
         </span>
         <span className="font-heading text-lg font-semibold tracking-tight">

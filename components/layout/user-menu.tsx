@@ -2,10 +2,11 @@
 
 import * as React from "react";
 import Link from "next/link";
-import { Download, LogOut, Settings, UserRound } from "lucide-react";
+import { Download, LogOut, Moon, Settings, Sun, UserRound } from "lucide-react";
 
 import { logoutAction } from "@/app/actions/auth";
 import { useInstall } from "@/components/pwa/install-provider";
+import { useTema } from "@/components/theme/theme-provider";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -33,6 +34,7 @@ interface UserMenuProps {
 export function UserMenu({ user }: UserMenuProps) {
   const [saliendo, startTransition] = React.useTransition();
   const { puedeInstalar, instalada, instalar } = useInstall();
+  const { oscuro, cambiar } = useTema();
 
   if (!user) return null;
 
@@ -84,7 +86,7 @@ export function UserMenu({ user }: UserMenuProps) {
               className="size-9 shrink-0 rounded-full object-cover"
             />
           ) : (
-            <span className="brand-gradient flex size-9 shrink-0 items-center justify-center rounded-full text-sm font-semibold text-[#0a0a0a]">
+            <span className="brand-gradient flex size-9 shrink-0 items-center justify-center rounded-full text-sm font-semibold text-primary-foreground">
               {inicial}
             </span>
           )}
@@ -112,6 +114,20 @@ export function UserMenu({ user }: UserMenuProps) {
         >
           <Settings />
           Ajustes
+        </DropdownMenuItem>
+
+        {/*
+          En el encabezado el botón de modo aparece recién en pantallas
+          grandes, así que en el teléfono este es el camino corto. El resto de
+          la apariencia se elige en Ajustes.
+        */}
+        <DropdownMenuItem
+          className="cursor-pointer px-2 py-2 sm:hidden"
+          closeOnClick={false}
+          onClick={() => cambiar({ modo: oscuro ? "claro" : "oscuro" })}
+        >
+          {oscuro ? <Sun /> : <Moon />}
+          {oscuro ? "Modo claro" : "Modo oscuro"}
         </DropdownMenuItem>
 
         {/* Solo si el navegador realmente puede instalarla acá y ahora. */}

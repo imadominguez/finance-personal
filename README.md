@@ -5,7 +5,8 @@ Registrás lo que gastás y lo que cobrás, y la app te dice en qué se te está
 
 Construida con **Next.js 16 (App Router)**, **React 19**, **Tailwind CSS v4**, componentes
 **shadcn/ui** sobre Base UI, y **PostgreSQL con Prisma 7**. El diseño sigue `DESIGN.md`:
-dark mode, acentos naranja y animaciones suaves.
+oscuro y naranja de fábrica, animaciones suaves, y cada persona puede cambiarle el
+modo, el color y los bordes desde Ajustes.
 
 ## Qué hace
 
@@ -297,9 +298,18 @@ lib/
 
 ## Decisiones que vale la pena conocer
 
-- **Un solo tema.** La app es dark por diseño (`DESIGN.md`); `:root` y `.dark` comparten
-  valores y la clase queda en `<html>` para que las variantes `dark:` de shadcn sigan
-  aplicando.
+- **Tema personalizable con una sola variable.** `:root` es el modo claro y `.dark` el
+  oscuro; el acento entra por `--brand` y todo lo demás (`--primary`, `--ring`, los
+  `--chart-*`, la barra lateral, los degradados) se deriva con `color-mix`. Cambiar de
+  color no toca quince valores, toca uno. Ver `lib/theme.ts` y `components/theme/`.
+- **Un acento nunca queda ilegible.** Los ocho presets están medidos contra el fondo y las
+  tarjetas de cada modo, y un color elegido a mano se acerca al blanco o al negro lo justo
+  para llegar a 4.5:1 (`ajustarContraste`). `text-brand` se usa en etiquetas de 12px, así
+  que el mínimo es el de texto chico, no el de texto grande.
+- **El tema se aplica antes del primer pintado.** Un script en línea en el `<head>` lee lo
+  guardado en `localStorage` y corrige `<html>` mientras el navegador parsea, así no hay
+  parpadeo ni se pierde el prerender estático de la landing. La preferencia también se
+  guarda en la cuenta (`settings.theme`) para que siga a la persona a otro dispositivo.
 - **Gráficos a mano.** La dona y las barras son SVG y divs animados con transiciones de
   Tailwind, en vez de una librería de charts: menos JavaScript al cliente y control total
   del estilo y de las animaciones.

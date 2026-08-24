@@ -78,7 +78,7 @@ export function BarChart({
                   datum.projected
                     ? "bg-brand/25 outline-1 outline-brand/40 outline-dashed"
                     : isSelected || datum.highlight
-                      ? "brand-gradient shadow-[0_0_18px_-4px_rgba(232,93,36,0.8)]"
+                      ? "brand-gradient shadow-[0_0_18px_-4px_var(--sombra-marca)]"
                       : "bg-brand/70 group-hover:bg-brand",
                 )}
                 style={{
