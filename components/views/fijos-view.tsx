@@ -160,7 +160,12 @@ export function FijosView() {
                   className="animate-fade-up border-b border-hairline/70 last:border-0"
                   style={{ animationDelay: `${index * 40}ms` }}
                 >
-                  <div className="flex items-center gap-3 rounded-lg px-2 py-3 transition-colors duration-200 hover:bg-surface-raised">
+                  {/*
+                    En pantallas muy angostas el monto y el interruptor bajan a
+                    un segundo renglón: compartiendo uno solo, la descripción
+                    quedaba en 38 px y no se leía ni se podía tocar.
+                  */}
+                  <div className="flex flex-wrap items-center gap-x-3 gap-y-2 rounded-lg px-2 py-3 transition-colors duration-200 hover:bg-surface-raised">
                     <CategoryIcon icon={category.icon} color={category.color} />
 
                     <button
@@ -169,7 +174,7 @@ export function FijosView() {
                         setEditingRule(rule);
                         setRuleOpen(true);
                       }}
-                      className="min-w-0 flex-1 cursor-pointer text-left"
+                      className="flex min-h-11 min-w-0 flex-1 basis-32 cursor-pointer flex-col justify-center text-left sm:min-h-0"
                     >
                       <div className="flex items-center gap-2">
                         <span className="truncate text-sm font-medium">
@@ -197,7 +202,7 @@ export function FijosView() {
                     <Money
                       value={rule.amount}
                       settings={moneyFormat}
-                      className={`shrink-0 text-sm font-semibold ${
+                      className={`ml-auto shrink-0 text-sm font-semibold ${
                         rule.kind === "gasto" ? "text-brand" : "text-success"
                       }`}
                     />

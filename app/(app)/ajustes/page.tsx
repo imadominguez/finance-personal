@@ -10,5 +10,13 @@ export const metadata: Metadata = {
 
 export default async function AjustesPage() {
   const user = await getCurrentUser();
-  return <AjustesView user={user} />;
+
+  return (
+    <AjustesView
+      user={user}
+      // Vive solo en el servidor: al cliente le llega el número, no el secreto
+      // con el que el bot se autentica.
+      numeroDelBot={process.env["WHATSAPP_NUMERO"] ?? null}
+    />
+  );
 }

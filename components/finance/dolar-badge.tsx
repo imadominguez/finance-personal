@@ -25,7 +25,7 @@ export function DolarBadge({ className }: { className?: string }) {
     <Link
       href="/ajustes"
       title={`Mostrando todo en dólar ${cotizacion.nombre}. US$ 1 = ${valor}`}
-      className={`inline-flex shrink-0 items-center gap-1 rounded-full border border-brand/40 bg-brand/10 px-2 py-0.5 text-[11px] font-medium text-brand transition-colors duration-200 hover:bg-brand/20 ${className ?? ""}`}
+      className={`inline-flex shrink-0 items-center gap-1 rounded-full border border-brand/40 bg-brand/10 px-2 py-0.5 text-[11px] font-medium text-brand-realce transition-colors duration-200 hover:bg-brand/20 ${className ?? ""}`}
     >
       <span className="font-semibold">US$</span>
       <span className="max-w-24 truncate">

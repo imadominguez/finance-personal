@@ -11,6 +11,9 @@
     "moduleResolution": "bundler",
     "resolveJsonModule": true,
     "isolatedModules": true,
+    // Los tests corren con el runner de Node, que necesita la extensión en el
+    // import. `noEmit` ya está, que es lo único que exige TypeScript para esto.
+    "allowImportingTsExtensions": true,
     "jsx": "react-jsx",
     "incremental": true,
     "plugins": [

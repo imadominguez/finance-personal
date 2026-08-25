@@ -41,12 +41,20 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  /// Teléfono en formato E.164 vinculado por WhatsApp. Único: un número
+  /// pertenece a una sola cuenta, o cualquiera podría cargar gastos ajenos.
+  phone         String?   @unique
+  phoneLinkedAt DateTime?
+
   settings     Settings?
   sessions     Session[]
   categories   Category[]
   transactions Transaction[]
   recurring    RecurringRule[]
   installments InstallmentPlan[]
+
+  codigosWhatsapp  PhoneLinkCode[]
+  mensajesWhatsapp WhatsAppMessage[]
 
   @@map("users")
 }
@@ -136,6 +144,9 @@ model Transaction {
   user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   category Category @relation(fields: [categoryId], references: [id], onDelete: Restrict)
 
+  /// El mensaje de WhatsApp que lo creó, si vino por ahí.
+  mensajesWhatsapp WhatsAppMessage[]
+
   @@index([userId, date])
   @@index([categoryId])
   @@map("transactions")
@@ -195,4 +206,55 @@ model InstallmentPlan {
   @@index([userId])
   @@index([categoryId])
   @@map("installment_plans")
+}
+
+/// Código de un solo uso para probar que un teléfono es de quien dice serlo.
+///
+/// Va de la app al WhatsApp, nunca al revés: que alguien escriba un número en
+/// un formulario no prueba nada, mandar el código desde ese teléfono sí.
+model PhoneLinkCode {
+  id        String    @id @default(cuid())
+  userId    String
+  code      String    @unique
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime  @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("phone_link_codes")
+}
+
+/// Bitácora de lo que entró por WhatsApp.
+///
+/// No guarda el texto del mensaje: para lo que hace falta —no procesar dos
+/// veces lo mismo, poder deshacer lo último y limitar cuántos mensajes se
+/// atienden por número— alcanza con esto. La app no almacena conversaciones.
+model WhatsAppMessage {
+  id String @id @default(cuid())
+
+  /// `null` si el número que escribió no está vinculado a ninguna cuenta.
+  userId String?
+
+  /// Id del mensaje en WhatsApp. Único: es lo que da idempotencia, porque un
+  /// mismo mensaje puede llegar más de una vez.
+  waMessageId String @unique
+
+  phone String
+
+  /// Qué se hizo: registrado, deshecho, vinculado, no-entendido, sin-cuenta,
+  /// limitado.
+  outcome String
+
+  transactionId String?
+
+  createdAt DateTime @default(now())
+
+  user        User?        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  transaction Transaction? @relation(fields: [transactionId], references: [id], onDelete: SetNull)
+
+  @@index([phone, createdAt])
+  @@index([userId, createdAt])
+  @@map("whatsapp_messages")
 }

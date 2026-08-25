@@ -6,6 +6,27 @@ final de cada sección.
 
 ---
 
+## 6.0 El ancho del marco
+
+El contenido vive en una columna de **768 px** hasta `lg`, y de **1024 px** de
+ahí para arriba. No crece más: una fila de movimiento con la descripción en un
+extremo y el monto en el otro, separados por 1.200 px, se lee peor, no mejor.
+
+Y el ancho extra no se usa para estirar: se usa para **poner cosas al lado**.
+
+| Pantalla       | Qué se acomoda en dos columnas desde `lg`                    |
+| -------------- | ------------------------------------------------------------ |
+| `/hoy`         | En qué gastaste · Movimientos del día                        |
+| `/mes`         | Dona + día por día · Ranking, ingresos y últimos movimientos |
+| `/anio`        | Gráfico + detalle por mes · Ranking y accesos                |
+| `/movimientos` | Filtros (columna fija que acompaña el scroll) · Historial    |
+
+Las tarjetas que adentro reparten su contenido —la dona y su leyenda— deciden
+por **su propio ancho**, no por el de la ventana (`@container`): puesta en una
+columna de la mitad, la leyenda se apila sola en vez de cortar los nombres.
+
+---
+
 ## 6.1 Movimientos (`/movimientos`)
 
 Es el equivalente al módulo de catálogo del ERP: el listado con más volumen, el

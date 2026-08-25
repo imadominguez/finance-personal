@@ -1,0 +1,16 @@
+{
+  "name": "mis-finanzas-bot",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Puente entre WhatsApp y Mis Finanzas. NO forma parte del build de la app.",
+  "scripts": {
+    "start": "node index.mjs"
+  },
+  "dependencies": {
+    "@open-wa/wa-automate": "^4.77.0"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
