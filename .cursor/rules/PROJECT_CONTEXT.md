@@ -1,258 +1,80 @@
-# Expense Tracker - Contexto del Proyecto
+# Mis Finanzas — contexto del proyecto
 
-## Visión General
+> **Ojo con el resto de esta carpeta.** Los demás archivos de `.cursor/rules/`
+> describen un diseño anterior que nunca se construyó: un bot de WhatsApp
+> autónomo con tablas `gastos` y `categorias` que no existen en la base. No los
+> uses como referencia.
+>
+> Las fuentes confiables son:
+>
+> | Qué                             | Dónde                                                |
+> | ------------------------------- | ---------------------------------------------------- |
+> | Qué hace la app y cómo correrla | [`README.md`](../../README.md)                       |
+> | Sistema de diseño y temas       | [`DESIGN.md`](../../DESIGN.md)                       |
+> | Criterios de UX e interacción   | [`docs/ux/`](../../docs/ux/)                         |
+> | Modelo de datos                 | [`prisma/schema.prisma`](../../prisma/schema.prisma) |
+> | Lógica de negocio               | [`lib/finance.ts`](../../lib/finance.ts)             |
+> | Cómo construir pantallas        | las skills en `.claude/skills/`                      |
 
-**Nombre**: Expense Tracker Bot
-**Descripción**: Aplicación personal para administrar gastos diarios, mensuales y anuales a través de WhatsApp.
-**Usuario**: Multiusuario, con una cuenta por persona
-**Propósito Principal**: Capturar gastos via WhatsApp y visualizarlos en un dashboard inteligente.
+## Qué es
 
-## Cómo Funciona
+Una app de finanzas personales: se anotan gastos e ingresos y la app arma el
+resumen del **día**, del **mes** y del **año**. Está pensada para una persona
+llevando su plata, no para una empresa.
 
-1. El usuario envía un mensaje por WhatsApp: `"gaste $20000 en supermercado"`
-2. Meta WhatsApp Business API recibe el mensaje en el webhook backend
-3. El backend parsea el mensaje (extrae monto, concepto, fecha/hora)
-4. Se categoriza automáticamente el gasto (reglas + IA opcional)
-5. Se guarda en PostgreSQL con la categoría correspondiente
-6. El bot responde: `"✓ Registrado $20000 en Alimentos"`
-7. El dashboard muestra:
-   - Resumen de **hoy** (por categoría)
-   - Resumen de **este mes** (gráfico + detalle)
-   - Resumen de **este año** (tendencias por mes)
-   - Historial completo filtrable
+Posicionamiento explícito, escrito en la landing: **no se conecta con el banco**.
+Los movimientos los carga la persona. Es lo que hace que los números cierren.
 
-## Stack Tecnológico
+## Stack
 
-### Full-Stack Monolítico (Una sola app)
-- **Framework**: Next.js 16 (latest)
-- **Runtime**: Node.js
-- **Lenguaje**: TypeScript
-- **ORM**: Prisma
-- **Base de Datos**: PostgreSQL
+| Capa       | Qué                                                                    |
+| ---------- | ---------------------------------------------------------------------- |
+| Framework  | Next.js 16 (App Router, Turbopack)                                     |
+| Interfaz   | React 19, Tailwind CSS v4, shadcn/ui sobre Base UI                     |
+| Base       | PostgreSQL (Neon) con Prisma 7 y driver adapter (`@prisma/adapter-pg`) |
+| Mutaciones | Server Actions con estado optimista                                    |
+| Sesión     | Propia: sesiones en base + JWT en cookie httpOnly. Se entra con Google |
+| Hosting    | Vercel, todo en un solo proyecto                                       |
+| Tests      | Runner de Node (`pnpm test`), sin dependencias extra                   |
 
-### Frontend (React)
-- **Estilos**: Tailwind CSS
-- **Componentes UI**: shadcn/ui (opcional)
-- **Gráficos**: Recharts
-- **State Management**: React Context API (MVP) o Zustand
-- **Formatos de Fecha**: date-fns
+**El gestor de paquetes es pnpm.** Agregar algo con `npm install` rompe el
+deploy: actualiza `package-lock.json` y deja `pnpm-lock.yaml` sin el paquete, y
+Vercel instala con `--frozen-lockfile`.
 
-### Backend (Route Handlers)
-- **API**: Next.js `/app/api` route handlers
-- **Integración WhatsApp**: Meta WhatsApp Business API
-- **Validación**: Zod para schemas
+## Pantallas
 
-### Deployment
-- **Hosting**: Vercel (todo monolítico)
-- **Base de Datos**: PostgreSQL (Railway, Render, o Supabase)
+`/hoy` · `/mes` · `/anio` (las tres vistas de período, siempre visibles en la
+navegación) · `/movimientos` · `/fijos` · `/categorias` · `/ajustes`, más la
+landing pública `/` y el ingreso `/ingresar`.
 
-### Herramientas Adicionales
-- **HTTP Client**: Fetch API nativa
-- **Testing**: Jest + React Testing Library (futuro)
-- **ORM**: Prisma Client
+## Modelo de datos
 
-## Características Principales
+`User` · `Session` · `Settings` · `Category` · `Transaction` · `RecurringRule` ·
+`InstallmentPlan` · `PhoneLinkCode` · `WhatsAppMessage`.
 
-### MVP (Lanzamiento inicial)
-- ✅ Recibir mensajes de WhatsApp
-- ✅ Parsear gastos (monto + concepto)
-- ✅ Categorizar automáticamente
-- ✅ Guardar en PostgreSQL
-- ✅ Responder confirmación por WhatsApp
-- ✅ Dashboard con vistas: Hoy / Mes / Año
-- ✅ Gráficos por categoría (Pie chart)
-- ✅ Listado de transacciones filtrable
+Dos cosas que conviene saber antes de tocar nada:
 
-### Futuro (Fase 2+)
-- Editar/eliminar gastos desde dashboard
-- Búsqueda avanzada (por fecha, categoría, rango)
-- Reportes exportables (PDF)
-- Predicciones de presupuesto
-- Gráficos de tendencia anual
-- Sincronización multi-dispositivo
+- **Los gastos fijos y las cuotas no se materializan.** No hay una fila por cada
+  ocurrencia: se proyectan al leer, con `expandRecurring` y `expandInstallments`
+  en `lib/finance.ts`. Eso es lo que permite editar una regla y que se corrija
+  todo el historial proyectado.
+- **La plata se guarda en `Decimal(14,2)`**, nunca en `Float`.
 
-## Costos
+## Módulos con parte afuera de la app
 
-**Total**: $0 (100% gratuito)
+**WhatsApp** (`bot/`): se pueden cargar gastos mandándole un mensaje al bot.
+open-wa necesita un proceso prendido, así que vive fuera de Vercel; la app solo
+expone `POST /api/whatsapp/entrante`. Toda la lógica —interpretar el texto,
+vincular el número, guardar— está en `lib/whatsapp/`, con tests. Ver
+[`bot/README.md`](../../bot/README.md).
 
-- Meta WhatsApp API: Gratis (hasta 1000 msgs/mes)
-- PostgreSQL: Gratis (Railway 5GB)
-- Backend: Gratis (Railway/Render)
-- Frontend: Gratis (Vercel)
+## Cómo trabajar acá
 
-## Equipo
-
-- **Desarrollador**: 1 persona (uso personal)
-- **Usuarios**: Cada persona con su cuenta; los datos no se comparten entre cuentas
-
-## Restricciones y Requisitos
-
-> **Actualizado**: la app pasó a ser **multiusuario con cuentas**. Cada persona se
-> ingresa **con Google** (OAuth 2.0 + PKCE, implementado a mano en `lib/auth/google.ts`)
-> y ve solo sus datos; todas las tablas cuelgan de `User`. No hay contraseñas. Las
-> sesiones viven en la tabla `sessions`, con el id firmado en una cookie `httpOnly`.
-> Ver `README.md` y `lib/auth/`.
-
-❌ NO incluir:
-- Notificaciones de presupuesto
-- Sincronización en tiempo real
-- Ingreso con email y contraseña: se eliminó, solo se entra con Google
-
-✅ INCLUIR:
-- Cuentas de usuario con datos aislados por `userId`
-- Historial completo (todas las fechas)
-- Vistas por día, mes, año
-- Parseo flexible de mensajes
-- Categorización automática
-- Respuestas rápidas por WhatsApp
-
-## Estructura de Carpetas
-
-```
-expense-tracker/                # Todo en una app Next.js
-├── app/                       # Next.js App Router
-│   ├── api/                   # Route handlers (Backend)
-│   │   ├── gastos/
-│   │   │   └── route.ts       # GET, POST /api/gastos
-│   │   ├── gastos/[id]/
-│   │   │   └── route.ts       # GET, PUT, DELETE /api/gastos/[id]
-│   │   ├── gastos/mes/
-│   │   │   └── route.ts       # GET /api/gastos/mes
-│   │   ├── gastos/anio/
-│   │   │   └── route.ts       # GET /api/gastos/anio
-│   │   ├── gastos/tendencia/
-│   │   │   └── route.ts       # GET /api/gastos/tendencia
-│   │   ├── categorias/
-│   │   │   └── route.ts       # GET, PUT /api/categorias
-│   │   ├── estadisticas/
-│   │   │   └── route.ts       # GET /api/estadisticas
-│   │   ├── webhook/
-│   │   │   └── whatsapp/
-│   │   │       └── route.ts   # POST/GET /api/webhook/whatsapp
-│   │   └── health/
-│   │       └── route.ts       # GET /api/health
-│   │
-│   ├── dashboard/             # Frontend
-│   │   ├── layout.tsx
-│   │   ├── page.tsx
-│   │   ├── dia/page.tsx
-│   │   ├── mes/page.tsx
-│   │   └── anio/page.tsx
-│   │
-│   ├── transacciones/
-│   │   ├── layout.tsx
-│   │   ├── page.tsx
-│   │   ├── [id]/page.tsx
-│   │   ├── nuevo/page.tsx
-│   │   └── editar/[id]/page.tsx
-│   │
-│   ├── categorias/
-│   │   ├── page.tsx
-│   │   └── [id]/page.tsx
-│   │
-│   ├── layout.tsx             # Root layout
-│   └── page.tsx               # Home (/)
-│
-├── components/                # Componentes React (Frontend)
-│   ├── ui/                    # Base UI (shadcn)
-│   ├── charts/                # Gráficos
-│   ├── features/              # Features
-│   ├── layouts/               # Layouts
-│   └── common/                # Componentes comunes
-│
-├── hooks/                     # Custom hooks
-│   ├── useExpenses.ts
-│   ├── useCategories.ts
-│   └── ...
-│
-├── lib/                       # Librerías y utilidades
-│   ├── prisma.ts             # Prisma Client singleton
-│   ├── api.ts                # Funciones de API (usado en route handlers)
-│   ├── types.ts              # Tipos TypeScript (compartidos)
-│   ├── constants.ts          # Constantes
-│   ├── formatting.ts         # Formateo
-│   ├── validation.ts         # Schemas Zod
-│   └── utils.ts              # Utilidades
-│
-├── styles/                    # CSS global
-│   ├── globals.css
-│   └── variables.css
-│
-├── public/                    # Assets estáticos
-│   └── icons/
-│
-├── prisma/                    # Prisma
-│   ├── schema.prisma          # Schema BD
-│   └── migrations/            # Migraciones
-│
-├── .env.example              # Variables de entorno
-├── .env.local                # (local, no commitear)
-├── .gitignore
-├── next.config.js
-├── tsconfig.json
-├── tailwind.config.js
-├── prisma.schema
-├── package.json
-└── README.md
-```
-
-## Variables de Entorno
-
-### .env.local (Development)
-```
-# PostgreSQL
-DATABASE_URL=postgresql://user:pass@localhost:5432/expense_tracker
-
-# Meta WhatsApp
-WHATSAPP_PHONE_ID=xxxx
-WHATSAPP_TOKEN=xxxx
-VERIFY_TOKEN=tu_token_aleatorio
-
-# Next.js (público en cliente)
-NEXT_PUBLIC_APP_NAME=Expense Tracker
-
-# Opcional
-NODE_ENV=development
-LOG_LEVEL=debug
-```
-
-### .env.production (Producción/Vercel)
-```
-DATABASE_URL=postgresql://user:pass@host:5432/expense_tracker  # Railway/Render
-WHATSAPP_PHONE_ID=xxxx
-WHATSAPP_TOKEN=xxxx
-VERIFY_TOKEN=tu_token_aleatorio
-NEXT_PUBLIC_APP_NAME=Expense Tracker
-```
-
-**Nota**: Las variables con prefijo `NEXT_PUBLIC_` son accesibles en el cliente (browser).
-Las demás solo en el servidor (route handlers).
-
-## URLs Base
-
-### Desarrollo
-- **App Completa**: `http://localhost:3000`
-- **Frontend**: `http://localhost:3000` (pages en `/dashboard`, `/transacciones`, etc)
-- **API**: `http://localhost:3000/api/...`
-- **Webhook WhatsApp**: `POST http://localhost:3000/api/webhook/whatsapp`
-
-### Producción (Vercel)
-- **App Completa**: `https://expense-tracker.vercel.app`
-- **API**: `https://expense-tracker.vercel.app/api/...`
-- **Webhook WhatsApp**: `https://expense-tracker.vercel.app/api/webhook/whatsapp`
-
-## Próximos Pasos
-
-1. ✅ Planificación (actual)
-2. ⬜ Setup inicial (BD, backend, frontend)
-3. ⬜ Meta WhatsApp API integration
-4. ⬜ Parser + Categorizador
-5. ⬜ Dashboard básico
-6. ⬜ Deploy y testing
-
-## Notas Importantes
-
-- La app es **responsabilidad del usuario** verificar que los gastos se registren correctamente
-- No hay validación de presupuestos (solo tracking)
-- Todos los datos se guardan localmente en la BD del usuario
-- El historial es permanente (no se borra)
+1. **Mobile primero.** Se resuelve a 360 px y el escritorio es la ampliación,
+   nunca al revés. Está en `docs/ux/` y en la skill `ux-mobile-first`.
+2. **Los textos siguen una guía**: voseo rioplatense, y todo mensaje dice qué
+   pasó, por qué y qué hacer. Skill `ux-copy`.
+3. **Nada de hex sueltos**: se usan los tokens (`bg-brand`, `text-brand`,
+   `border-hairline`), porque el acento es configurable por cada persona.
+4. **Al terminar**, correr la auditoría: `node
+.claude/skills/ux-auditoria/scripts/auditar.mjs`.

@@ -4,7 +4,10 @@ import { revalidatePath } from "next/cache";
 
 import { requireSession } from "@/lib/auth/dal";
 import { prisma } from "@/lib/db/prisma";
-import { getFallbackCategoryId } from "@/lib/db/finance-repository";
+import {
+  crearMovimiento,
+  getFallbackCategoryId,
+} from "@/lib/db/finance-repository";
 import { keyToDate } from "@/lib/db/mappers";
 import {
   categorySchema,
@@ -66,18 +69,8 @@ export async function createTransactionAction(
   const category = await assertOwnCategory(userId, parsed.data.categoryId);
   if (!category) return fail("La categoría no existe");
 
-  await prisma.transaction.create({
-    data: {
-      userId,
-      kind: parsed.data.kind,
-      amount: parsed.data.amount,
-      categoryId: parsed.data.categoryId,
-      description: parsed.data.description,
-      date: keyToDate(parsed.data.date),
-      method: parsed.data.method,
-      note: parsed.data.note,
-    },
-  });
+  // El mismo camino que usa el webhook de WhatsApp.
+  await crearMovimiento(userId, parsed.data);
 
   refresh();
   return OK;

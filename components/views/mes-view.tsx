@@ -113,7 +113,10 @@ export function MesView() {
             : {
                 value: 0,
                 hint: (
-                  <Link href="/ajustes" className="text-brand hover:underline">
+                  <Link
+                    href="/ajustes"
+                    className="inline-flex min-h-11 items-center text-brand hover:underline sm:min-h-6"
+                  >
                     Definí tu sueldo o tope mensual para ver el avance
                   </Link>
                 ),

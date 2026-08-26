@@ -124,9 +124,22 @@ export const themeSchema = z.object({
     ),
 });
 
+/**
+ * Lo que manda el bot de WhatsApp. Se valida como todo lo que entra de afuera,
+ * y con más razón: este endpoint puede crear movimientos sin cookie de sesión.
+ */
+export const whatsappEntranteSchema = z.object({
+  waMessageId: z.string().trim().min(1).max(200),
+  /** Como lo entrega open-wa: `5491123456789@c.us`. Se normaliza después. */
+  phone: z.string().trim().min(5).max(60),
+  body: z.string().max(4096),
+  isGroup: z.boolean().optional(),
+});
+
 export type TransactionInput = z.infer<typeof transactionSchema>;
 export type CategoryInput = z.infer<typeof categorySchema>;
 export type RecurringInput = z.infer<typeof recurringSchema>;
 export type InstallmentInput = z.infer<typeof installmentSchema>;
 export type SettingsInput = z.infer<typeof settingsSchema>;
+export type WhatsappEntranteInput = z.infer<typeof whatsappEntranteSchema>;
 export type ThemeInput = z.infer<typeof themeSchema>;

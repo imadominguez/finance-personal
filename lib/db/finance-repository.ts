@@ -13,7 +13,8 @@ import {
   SEED_CATEGORIES,
   STATE_VERSION,
 } from "@/lib/constants";
-import type { FinanceState } from "@/lib/types";
+import { keyToDate } from "@/lib/db/mappers";
+import type { FinanceState, MovementKind, PaymentMethod } from "@/lib/types";
 
 /**
  * Lee todo lo del usuario en una sola ida a la base y lo devuelve con la misma
@@ -167,4 +168,44 @@ export async function getFallbackCategoryId(
   });
 
   return created.id;
+}
+
+/** Lo mínimo para dar de alta un movimiento, venga de donde venga. */
+export interface MovimientoNuevo {
+  kind: MovementKind;
+  amount: number;
+  categoryId: string;
+  description: string;
+  /** `YYYY-MM-DD`. */
+  date: string;
+  method: PaymentMethod;
+  note?: string;
+}
+
+/**
+ * Da de alta un movimiento y devuelve su id.
+ *
+ * Vive acá y no adentro de la Server Action porque hay dos caminos que
+ * terminan en lo mismo: la app y el webhook de WhatsApp. Compartir la
+ * escritura es lo que evita que se separen con el tiempo.
+ */
+export async function crearMovimiento(
+  userId: string,
+  datos: MovimientoNuevo,
+): Promise<string> {
+  const creado = await prisma.transaction.create({
+    data: {
+      userId,
+      kind: datos.kind,
+      amount: datos.amount,
+      categoryId: datos.categoryId,
+      description: datos.description,
+      date: keyToDate(datos.date),
+      method: datos.method,
+      note: datos.note,
+    },
+    select: { id: true },
+  });
+
+  return creado.id;
 }

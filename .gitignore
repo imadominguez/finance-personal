@@ -42,3 +42,8 @@ yarn-error.log*
 next-env.d.ts
 
 /lib/generated/prisma
+
+# el bot de WhatsApp: dependencias propias y la sesión de WhatsApp Web
+bot/node_modules
+bot/sesion
+bot/.wwebjs_auth
